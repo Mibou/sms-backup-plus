@@ -23,8 +23,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import android.text.format.DateFormat;
 import android.util.Log;
-import com.firebase.jobdispatcher.Job;
-import com.firebase.jobdispatcher.JobTrigger;
 import com.fsck.k9.mail.MessagingException;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
@@ -52,6 +50,7 @@ import static com.zegoggles.smssync.App.CHANNEL_ID;
 import static com.zegoggles.smssync.App.LOCAL_LOGV;
 import static com.zegoggles.smssync.App.TAG;
 import static com.zegoggles.smssync.activity.AppPermission.formatMissingPermissionDetails;
+import static com.zegoggles.smssync.service.BackupType.INCOMING;
 import static com.zegoggles.smssync.service.BackupType.MANUAL;
 import static com.zegoggles.smssync.service.BackupType.REGULAR;
 import static com.zegoggles.smssync.service.BackupType.SKIP;
@@ -115,7 +114,7 @@ public class SmsBackupService extends ServiceBase {
             checkPermissions(enabledTypes);
             if (backupType != SKIP) {
                 checkCredentials();
-                if (getPreferences().isUseOldScheduler()) {
+                if (requiresManualConnectivityCheck(backupType)) {
                     legacyCheckConnectivity();
                 }
             }
@@ -272,18 +271,28 @@ public class SmsBackupService extends ServiceBase {
         startForeground(BACKUP_ID, notification);
     }
 
+    /**
+     * REGULAR and INCOMING backups are scheduled through WorkManager, which enforces the
+     * network/wifi constraints itself. Other backups (manual, 3rd-party broadcast) bypass the
+     * scheduler and therefore still need a manual connectivity check.
+     */
+    private boolean requiresManualConnectivityCheck(BackupType backupType) {
+        return backupType != REGULAR && backupType != INCOMING;
+    }
+
     private void scheduleNextBackup(BackupState state) {
-        if (state.backupType == REGULAR && getPreferences().isUseOldScheduler()) {
-            final Job nextSync = getBackupJobs().scheduleRegular();
-            if (nextSync != null) {
-                JobTrigger.ExecutionWindowTrigger trigger = (JobTrigger.ExecutionWindowTrigger) nextSync.getTrigger();
-                Date date = new Date(System.currentTimeMillis() + (trigger.getWindowStart() * 1000));
-                appLog(R.string.app_log_scheduled_next_sync,
-                        DateFormat.format("kk:mm", date));
-            } else {
-                appLog(R.string.app_log_no_next_sync);
-            }
-        } // else job already persisted
+        if (state.backupType != REGULAR) {
+            return;
+        }
+        getBackupJobs().scheduleRegular();
+
+        final int nextInSeconds = getPreferences().getRegularTimeoutSecs();
+        if (getPreferences().isAutoBackupEnabled() && nextInSeconds > 0) {
+            final Date date = new Date(System.currentTimeMillis() + (nextInSeconds * 1000L));
+            appLog(R.string.app_log_scheduled_next_sync, DateFormat.format("kk:mm", date));
+        } else {
+            appLog(R.string.app_log_no_next_sync);
+        }
     }
 
     void notifyUser(int notificationId, NotificationCompat.Builder builder) {

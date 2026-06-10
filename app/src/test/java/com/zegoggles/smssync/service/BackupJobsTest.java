@@ -1,145 +1,111 @@
 package com.zegoggles.smssync.service;
 
-import android.content.Intent;
-import android.content.pm.ResolveInfo;
-import android.content.pm.ServiceInfo;
-import com.firebase.jobdispatcher.Constraint;
-import com.firebase.jobdispatcher.Job;
-import com.firebase.jobdispatcher.JobTrigger;
-import com.firebase.jobdispatcher.ObservedUri;
-import com.firebase.jobdispatcher.Trigger;
+import android.os.Build;
+
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+import androidx.work.testing.WorkManagerTestInitHelper;
+
 import com.zegoggles.smssync.preferences.DataTypePreferences;
 import com.zegoggles.smssync.preferences.Preferences;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
-import org.robolectric.shadows.ShadowPackageManager;
+import org.robolectric.annotation.Config;
 
-import static com.firebase.jobdispatcher.ObservedUri.Flags.FLAG_NOTIFY_FOR_DESCENDANTS;
+import java.util.List;
+
 import static com.google.common.truth.Truth.assertThat;
-import static com.zegoggles.smssync.Consts.CALLLOG_PROVIDER;
-import static com.zegoggles.smssync.Consts.SMS_PROVIDER;
-import static com.zegoggles.smssync.mail.DataType.CALLLOG;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.robolectric.Shadows.shadowOf;
 
 @RunWith(RobolectricTestRunner.class)
 public class BackupJobsTest {
     private BackupJobs subject;
+    private WorkManager workManager;
 
     @Mock private Preferences preferences;
     @Mock private DataTypePreferences dataTypePreferences;
 
     @Before public void before() {
         initMocks(this);
-        ShadowPackageManager pm = shadowOf(RuntimeEnvironment.application.getPackageManager());
-
-        Intent executeIntent = new Intent("com.firebase.jobdispatcher.ACTION_EXECUTE");
-        executeIntent.setClassName(RuntimeEnvironment.application, "com.zegoggles.smssync.service.SmsJobService");
-
-        ResolveInfo ri = new ResolveInfo();
-        ServiceInfo si = new ServiceInfo();
-        si.packageName = "com.zegoggles.smssync.service.SmsJobService";
-        ri.serviceInfo = si;
-        ri.isDefault = true;
-
-        pm.addResolveInfoForIntent(executeIntent, ri);
+        WorkManagerTestInitHelper.initializeTestWorkManager(RuntimeEnvironment.application);
+        workManager = WorkManager.getInstance(RuntimeEnvironment.application);
         subject = new BackupJobs(RuntimeEnvironment.application, preferences);
         when(preferences.getDataTypePreferences()).thenReturn(dataTypePreferences);
     }
 
     @Test public void shouldScheduleImmediate() throws Exception {
-        Job job = subject.scheduleImmediate();
-        verifyJobScheduled(job, -1, "BROADCAST_INTENT");
+        subject.scheduleImmediate();
+        assertScheduled(BackupType.BROADCAST_INTENT.name());
     }
 
     @Test public void shouldScheduleRegular() throws Exception {
         when(preferences.isAutoBackupEnabled()).thenReturn(true);
         when(preferences.getRegularTimeoutSecs()).thenReturn(2000);
-        Job job = subject.scheduleRegular();
-        verifyJobScheduled(job, 2000, "REGULAR");
-    }
-
-    @Test public void shouldScheduleContentUriTriggerForSMS() throws Exception {
-        Job job = subject.scheduleContentTriggerJob();
-        assertThat(job.getTrigger()).isInstanceOf(JobTrigger.ContentUriTrigger.class);
-
-        JobTrigger.ContentUriTrigger contentUriTrigger = (JobTrigger.ContentUriTrigger) job.getTrigger();
-        assertThat(contentUriTrigger.getUris()).containsExactly(new ObservedUri(SMS_PROVIDER, FLAG_NOTIFY_FOR_DESCENDANTS));
-    }
-
-    @Test public void shouldScheduleContentUriTriggerForCallLogIfEnabled() throws Exception {
-        when(preferences.isCallLogBackupAfterCallEnabled()).thenReturn(true);
-        when(dataTypePreferences.isBackupEnabled(CALLLOG)).thenReturn(true);
-
-        Job job = subject.scheduleContentTriggerJob();
-        assertThat(job.getTrigger()).isInstanceOf(JobTrigger.ContentUriTrigger.class);
-
-        JobTrigger.ContentUriTrigger contentUriTrigger = (JobTrigger.ContentUriTrigger) job.getTrigger();
-        assertThat(contentUriTrigger.getUris()).containsExactly(
-            new ObservedUri(SMS_PROVIDER, FLAG_NOTIFY_FOR_DESCENDANTS),
-            new ObservedUri(CALLLOG_PROVIDER, FLAG_NOTIFY_FOR_DESCENDANTS)
-        );
-    }
-
-    @Test public void shouldScheduleRegularJobAfterBootForOldScheduler() throws Exception {
-        when(preferences.isAutoBackupEnabled()).thenReturn(true);
-        when(preferences.isUseOldScheduler()).thenReturn(true);
-        Job job = subject.scheduleBootup();
-        verifyJobScheduled(job, 60, "REGULAR");
-    }
-
-    @Test public void shouldScheduleNothingAfterBootForNewScheduler() throws Exception {
-        when(preferences.isAutoBackupEnabled()).thenReturn(true);
-        when(preferences.isUseOldScheduler()).thenReturn(false);
-        Job job = subject.scheduleBootup();
-        assertThat(job).isNull();
-    }
-
-    @Test public void shouldCancelAllJobsAfterBootIfAutoBackupDisabled() throws Exception {
-        when(preferences.isAutoBackupEnabled()).thenReturn(false);
-        Job job = subject.scheduleBootup();
-        assertThat(job).isNull();
+        subject.scheduleRegular();
+        assertScheduled(BackupType.REGULAR.name());
     }
 
     @Test public void shouldScheduleIncoming() throws Exception {
         when(preferences.isAutoBackupEnabled()).thenReturn(true);
         when(preferences.getIncomingTimeoutSecs()).thenReturn(2000);
-        Job job = subject.scheduleIncoming();
-        verifyJobScheduled(job, 2000, "INCOMING");
+        subject.scheduleIncoming();
+        assertScheduled(BackupType.INCOMING.name());
+    }
+
+    @Test @Config(sdk = Build.VERSION_CODES.N)
+    public void shouldScheduleContentTriggerJob() throws Exception {
+        subject.scheduleContentTriggerJob();
+        assertScheduled(BackupJobs.CONTENT_TRIGGER_TAG);
+    }
+
+    @Test @Config(sdk = Build.VERSION_CODES.M)
+    public void shouldNotScheduleContentTriggerJobBeforeApi24() throws Exception {
+        subject.scheduleContentTriggerJob();
+        assertNotScheduled(BackupJobs.CONTENT_TRIGGER_TAG);
+    }
+
+    @Test public void shouldScheduleRegularJobAfterBoot() throws Exception {
+        when(preferences.isAutoBackupEnabled()).thenReturn(true);
+        when(preferences.getRegularTimeoutSecs()).thenReturn(2000);
+        subject.scheduleBootup();
+        assertScheduled(BackupType.REGULAR.name());
+    }
+
+    @Test public void shouldCancelAllJobsAfterBootIfAutoBackupDisabled() throws Exception {
+        when(preferences.isAutoBackupEnabled()).thenReturn(false);
+        subject.scheduleBootup();
+        assertNotScheduled(BackupType.REGULAR.name());
     }
 
     @Test public void shouldNotScheduleRegularBackupIfAutoBackupIsDisabled() throws Exception {
         when(preferences.isAutoBackupEnabled()).thenReturn(false);
-        assertThat(subject.scheduleRegular()).isEqualTo(null);
+        subject.scheduleRegular();
+        assertNotScheduled(BackupType.REGULAR.name());
     }
 
     @Test public void shouldNotScheduleIncomingBackupIfAutoBackupIsDisabled() throws Exception {
         when(preferences.isAutoBackupEnabled()).thenReturn(false);
-        assertThat(subject.scheduleIncoming()).isEqualTo(null);
+        subject.scheduleIncoming();
+        assertNotScheduled(BackupType.INCOMING.name());
     }
 
-    private void verifyJobScheduled(Job job, int scheduled, String expectedType) {
-        assertThat(job).isNotNull();
-        if (scheduled <= 0) {
-            assertThat(job.getTrigger()).isInstanceOf(JobTrigger.ImmediateTrigger.class);
-        } else {
-            assertThat(job.getTrigger()).isInstanceOf(JobTrigger.ExecutionWindowTrigger.class);
-            JobTrigger.ExecutionWindowTrigger trigger = (JobTrigger.ExecutionWindowTrigger) job.getTrigger();
-            JobTrigger.ExecutionWindowTrigger testTrigger = Trigger.executionWindow(scheduled, scheduled);
-            assertThat(trigger.getWindowEnd()).isEqualTo(testTrigger.getWindowEnd());
-            assertThat(trigger.getWindowStart()).isEqualTo(testTrigger.getWindowStart());
-        }
-        assertThat(job.getTag()).isEqualTo(expectedType);
+    private void assertScheduled(String uniqueName) throws Exception {
+        final List<WorkInfo> infos = workManager.getWorkInfosForUniqueWork(uniqueName).get();
+        assertThat(infos).hasSize(1);
+        assertThat(infos.get(0).getState()).isEqualTo(WorkInfo.State.ENQUEUED);
+        assertThat(infos.get(0).getTags()).contains(uniqueName);
+    }
 
-        if ("BROADCAST_INTENT".equals(expectedType)) {
-            assertThat(job.getConstraints()).isEmpty();
-        } else {
-            assertThat(job.getConstraints()).asList().contains(Constraint.ON_ANY_NETWORK);
+    private void assertNotScheduled(String uniqueName) throws Exception {
+        final List<WorkInfo> infos = workManager.getWorkInfosForUniqueWork(uniqueName).get();
+        for (WorkInfo info : infos) {
+            assertThat(info.getState()).isNotEqualTo(WorkInfo.State.ENQUEUED);
         }
     }
 }

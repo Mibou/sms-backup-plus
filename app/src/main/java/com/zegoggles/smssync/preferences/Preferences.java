@@ -54,7 +54,6 @@ import static com.zegoggles.smssync.preferences.Preferences.Keys.RESTORE_STARRED
 import static com.zegoggles.smssync.preferences.Preferences.Keys.SMS_DEFAULT_PACKAGE;
 import static com.zegoggles.smssync.preferences.Preferences.Keys.SMS_DEFAULT_PACKAGE_CHANGE_SEEN;
 import static com.zegoggles.smssync.preferences.Preferences.Keys.THIRD_PARTY_INTEGRATION;
-import static com.zegoggles.smssync.preferences.Preferences.Keys.USE_OLD_SCHEDULER;
 import static com.zegoggles.smssync.preferences.Preferences.Keys.WIFI_ONLY;
 
 public class Preferences {
@@ -102,7 +101,6 @@ public class Preferences {
         BACKUP_SETTINGS_SCREEN("com.zegoggles.smssync.activity.fragments.AutoBackupSettings"),
         SMS_DEFAULT_PACKAGE("sms_default_package"),
         SMS_DEFAULT_PACKAGE_CHANGE_SEEN("sms_default_package_change_seen"),
-        USE_OLD_SCHEDULER("use_old_scheduler"),
         DARK_THEME("dark_theme"),
         EMAIL_ADDRESS_STYLE("email_address_style");
 
@@ -276,14 +274,6 @@ public class Preferences {
         } else {
             return false;
         }
-    }
-
-    public boolean isUseOldScheduler() {
-        return preferences.getBoolean(USE_OLD_SCHEDULER.key, false);
-    }
-
-    public void setUseOldScheduler(boolean enabled) {
-        preferences.edit().putBoolean(USE_OLD_SCHEDULER.key, enabled).commit();
     }
 
     public @StyleRes int getAppTheme() {

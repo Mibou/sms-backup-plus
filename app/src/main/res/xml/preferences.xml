@@ -207,12 +207,6 @@
                 android:title="@string/ui_third_party_integration_label"
                 android:summary="@string/ui_third_party_integration_desc"
                 android:defaultValue="false"/>
-
-        <CheckBoxPreference
-                android:key="use_old_scheduler"
-                android:title="@string/pref_use_old_scheduler"
-                android:summary="@string/pref_use_old_scheduler_summary"
-                android:defaultValue="false"/>
     </PreferenceScreen>
 
     <PreferenceScreen

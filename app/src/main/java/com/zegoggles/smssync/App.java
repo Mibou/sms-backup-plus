@@ -30,10 +30,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.StrictMode;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.work.Configuration;
 import android.util.Log;
 import com.fsck.k9.mail.K9MailLib;
 import com.squareup.otto.Bus;
@@ -49,7 +51,7 @@ import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED
 import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
 import static android.content.pm.PackageManager.DONT_KILL_APP;
 
-public class App extends Application {
+public class App extends Application implements Configuration.Provider {
     private static final boolean DEBUG = BuildConfig.DEBUG;
     public static final boolean LOCAL_LOGV = DEBUG;
     public static final String TAG = "SMSBackup+";
@@ -77,12 +79,9 @@ public class App extends Application {
 
         backupJobs = new BackupJobs(this);
 
-        if (gcmAvailable) {
-            setBroadcastReceiversEnabled(false);
-        } else {
-            Log.v(TAG, "Google Play Services not available, forcing use of old scheduler");
-            preferences.setUseOldScheduler(true);
-        }
+        // On platforms without WorkManager content-uri triggers (API < 24) we fall back to
+        // the SMS broadcast receiver to detect incoming messages.
+        setBroadcastReceiversEnabled(usesBroadcastReceiver() && preferences.isAutoBackupEnabled());
 
         K9MailLib.setDebugStatus(new K9MailLib.DebugStatus() {
             @Override
@@ -105,11 +104,18 @@ public class App extends Application {
         register(this);
     }
 
+    @NonNull @Override
+    public Configuration getWorkManagerConfiguration() {
+        return new Configuration.Builder()
+            .setMinimumLoggingLevel(LOCAL_LOGV ? Log.VERBOSE : Log.INFO)
+            .build();
+    }
+
     @Subscribe public void autoBackupSettingsChanged(final AutoBackupSettingsChangedEvent event) {
         if (LOCAL_LOGV) {
             Log.v(TAG, "autoBackupSettingsChanged("+event+")");
         }
-        setBroadcastReceiversEnabled(preferences.isUseOldScheduler() && preferences.isAutoBackupEnabled());
+        setBroadcastReceiversEnabled(usesBroadcastReceiver() && preferences.isAutoBackupEnabled());
         rescheduleJobs();
     }
 
@@ -198,10 +204,18 @@ public class App extends Application {
         if (preferences.isAutoBackupEnabled()) {
             backupJobs.scheduleRegular();
 
-            if (preferences.getIncomingTimeoutSecs() > 0 && !preferences.isUseOldScheduler()) {
+            if (preferences.getIncomingTimeoutSecs() > 0 && !usesBroadcastReceiver()) {
                 backupJobs.scheduleContentTriggerJob();
             }
         }
+    }
+
+    /**
+     * Whether incoming messages are detected via the SMS broadcast receiver rather than via
+     * WorkManager content-uri triggers (only available on API 24+).
+     */
+    private boolean usesBroadcastReceiver() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.N;
     }
 
     private void setupStrictMode() {

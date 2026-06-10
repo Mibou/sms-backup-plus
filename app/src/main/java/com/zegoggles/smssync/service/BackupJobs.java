@@ -17,32 +17,24 @@
 package com.zegoggles.smssync.service;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.work.BackoffPolicy;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
-import com.firebase.jobdispatcher.FirebaseJobDispatcher;
-import com.firebase.jobdispatcher.GooglePlayDriver;
-import com.firebase.jobdispatcher.Job;
-import com.firebase.jobdispatcher.ObservedUri;
-import com.firebase.jobdispatcher.RetryStrategy;
-import com.firebase.jobdispatcher.Trigger;
 import com.zegoggles.smssync.mail.DataType;
 import com.zegoggles.smssync.preferences.Preferences;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import static com.firebase.jobdispatcher.Constraint.ON_ANY_NETWORK;
-import static com.firebase.jobdispatcher.Constraint.ON_UNMETERED_NETWORK;
-import static com.firebase.jobdispatcher.FirebaseJobDispatcher.CANCEL_RESULT_SUCCESS;
-import static com.firebase.jobdispatcher.FirebaseJobDispatcher.SCHEDULE_RESULT_SUCCESS;
-import static com.firebase.jobdispatcher.Lifetime.FOREVER;
-import static com.firebase.jobdispatcher.Lifetime.UNTIL_NEXT_BOOT;
-import static com.firebase.jobdispatcher.ObservedUri.Flags.FLAG_NOTIFY_FOR_DESCENDANTS;
-import static com.firebase.jobdispatcher.RetryStrategy.RETRY_POLICY_EXPONENTIAL;
-import static com.firebase.jobdispatcher.Trigger.NOW;
 import static com.zegoggles.smssync.App.LOCAL_LOGV;
 import static com.zegoggles.smssync.App.TAG;
 import static com.zegoggles.smssync.Consts.CALLLOG_PROVIDER;
@@ -51,53 +43,73 @@ import static com.zegoggles.smssync.service.BackupType.BROADCAST_INTENT;
 import static com.zegoggles.smssync.service.BackupType.INCOMING;
 import static com.zegoggles.smssync.service.BackupType.REGULAR;
 
-
+/**
+ * Schedules backups using {@link WorkManager}. WorkManager transparently uses
+ * {@code JobScheduler} on API 23+ and {@code AlarmManager} on older platforms, replacing the
+ * (now unmaintained) firebase-jobdispatcher and its hand-rolled AlarmManager driver.
+ */
 public class BackupJobs {
     private static final int BOOT_BACKUP_DELAY = 60;
-    static final String CONTENT_TRIGGER_TAG = "contentTrigger";
+    // initial backoff, exponential: [ 30, 60, 120, 240, ... ] seconds
+    private static final long BACKOFF_DELAY_SECONDS = 30;
 
+    static final String CONTENT_TRIGGER_TAG = "contentTrigger";
+    static final String DATA_BACKUP_TYPE = "backup_type";
+    static final String DATA_CONTENT_TRIGGER = "content_trigger";
+
+    private final Context context;
     private final Preferences preferences;
-    private final FirebaseJobDispatcher firebaseJobDispatcher;
 
     public BackupJobs(Context context) {
         this(context, new Preferences(context));
     }
 
     BackupJobs(Context context, Preferences preferences) {
+        this.context = context.getApplicationContext();
         this.preferences = preferences;
-        firebaseJobDispatcher = new FirebaseJobDispatcher(
-            preferences.isUseOldScheduler() ?
-            new AlarmManagerDriver(context) :
-            new GooglePlayDriver(context));
     }
 
-    public @Nullable Job scheduleIncoming() {
-        return schedule(preferences.getIncomingTimeoutSecs(), INCOMING, false);
+    private WorkManager workManager() {
+        // resolved lazily so that merely constructing BackupJobs (e.g. during Application#onCreate)
+        // does not force WorkManager to initialize
+        return WorkManager.getInstance(context);
     }
 
-    public Job scheduleRegular() {
-        return schedule(preferences.getRegularTimeoutSecs(), REGULAR, false);
+    public void scheduleIncoming() {
+        schedule(preferences.getIncomingTimeoutSecs(), INCOMING, false);
     }
 
-    public @Nullable Job scheduleContentTriggerJob() {
-        return schedule(createContentUriTriggerJob());
+    public void scheduleRegular() {
+        schedule(preferences.getRegularTimeoutSecs(), REGULAR, false);
     }
 
-    public @Nullable Job scheduleBootup() {
+    public void scheduleBootup() {
         if (!preferences.isAutoBackupEnabled()) {
             Log.d(TAG, "auto backup no longer enabled, canceling all jobs");
             cancelAll();
-            return null;
-        } else if (preferences.isUseOldScheduler()) {
-            return schedule(BOOT_BACKUP_DELAY, REGULAR, false);
         } else {
-            // everything else should be persistent by GCM
-            return null;
+            schedule(BOOT_BACKUP_DELAY, REGULAR, false);
         }
     }
 
-    public @Nullable Job scheduleImmediate() {
-        return schedule(-1, BROADCAST_INTENT, true);
+    public void scheduleImmediate() {
+        schedule(-1, BROADCAST_INTENT, true);
+    }
+
+    public void scheduleContentTriggerJob() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            if (LOCAL_LOGV) Log.v(TAG, "content uri triggers not supported on this platform");
+            return;
+        }
+        final OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(SmsBackupWorker.class)
+            .addTag(CONTENT_TRIGGER_TAG)
+            .setConstraints(contentTriggerConstraints())
+            .setInputData(new Data.Builder()
+                .putString(DATA_BACKUP_TYPE, INCOMING.name())
+                .putBoolean(DATA_CONTENT_TRIGGER, true)
+                .build())
+            .build();
+        enqueue(CONTENT_TRIGGER_TAG, request);
     }
 
     public void cancelAll() {
@@ -113,95 +125,67 @@ public class BackupJobs {
         cancel(CONTENT_TRIGGER_TAG);
     }
 
-    private void cancel(String tag) {
-        final int result = firebaseJobDispatcher.cancel(tag);
-        if (result == CANCEL_RESULT_SUCCESS) {
-            if (LOCAL_LOGV) {
-                Log.v(TAG, "cancel("+tag+")");
-            }
-        } else {
-            Log.w(TAG, "unable to cancel jobs: "+result);
-        }
+    private void cancel(String uniqueName) {
+        if (LOCAL_LOGV) Log.v(TAG, "cancel(" + uniqueName + ")");
+        workManager().cancelUniqueWork(uniqueName);
     }
 
-    @Nullable private Job schedule(int inSeconds, BackupType backupType, boolean force) {
+    private void schedule(int inSeconds, BackupType backupType, boolean force) {
         if (LOCAL_LOGV) {
             Log.v(TAG, "scheduleBackup(" + inSeconds + ", " + backupType + ", " + force + ")");
         }
 
         if (force || (preferences.isAutoBackupEnabled() && inSeconds > 0)) {
-            final Job job = createJob(inSeconds, backupType);
-            if (schedule(job) != null) {
-                if (LOCAL_LOGV) {
-                    Log.v(TAG, "Scheduled backup job " + job + ", tag: " + job.getTag() + " due " +
-                            "" + (inSeconds > 0 ? "in " + inSeconds + " seconds" : "now"));
-                }
+            enqueue(backupType.name(), createRequest(inSeconds, backupType));
+            if (LOCAL_LOGV) {
+                Log.v(TAG, "Scheduled backup job " + backupType + " due " +
+                        (inSeconds > 0 ? "in " + inSeconds + " seconds" : "now"));
             }
-            return job;
         } else {
             if (LOCAL_LOGV) Log.v(TAG, "Not scheduling backup because auto backup is disabled.");
-            return null;
         }
     }
 
-    private Job schedule(Job job) {
-        if (LOCAL_LOGV) {
-            Log.v(TAG, "schedule job " + job.getTag());
-        }
-        final int result = firebaseJobDispatcher.schedule(job);
-        if (result == SCHEDULE_RESULT_SUCCESS) {
-            return job;
-        } else {
-            Log.w(TAG, "Error scheduling job: "+result);
-            return null;
-        }
+    private void enqueue(String uniqueName, OneTimeWorkRequest request) {
+        workManager().enqueueUniqueWork(uniqueName, ExistingWorkPolicy.REPLACE, request);
     }
 
-    private @NonNull Job createJob(int inSeconds, BackupType backupType) {
-        return createBuilder(backupType)
-            .setTrigger(inSeconds <= 0 ? NOW : Trigger.executionWindow(inSeconds, inSeconds))
-            .setRecurring(backupType.isRecurring())
-            .setLifetime(backupType.isRecurring() ? FOREVER : UNTIL_NEXT_BOOT)
+    private @NonNull OneTimeWorkRequest createRequest(int inSeconds, BackupType backupType) {
+        final OneTimeWorkRequest.Builder builder = new OneTimeWorkRequest.Builder(SmsBackupWorker.class)
+            .addTag(backupType.name())
+            .setConstraints(jobConstraints(backupType))
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, BACKOFF_DELAY_SECONDS, TimeUnit.SECONDS)
+            .setInputData(new Data.Builder().putString(DATA_BACKUP_TYPE, backupType.name()).build());
+
+        if (inSeconds > 0) {
+            builder.setInitialDelay(inSeconds, TimeUnit.SECONDS);
+        }
+        return builder.build();
+    }
+
+    private Constraints jobConstraints(BackupType backupType) {
+        if (backupType == BROADCAST_INTENT) {
+            return Constraints.NONE;
+        }
+        return new Constraints.Builder()
+            .setRequiredNetworkType(networkType())
             .build();
     }
 
-    private @NonNull Job createContentUriTriggerJob() {
-        return createBuilder(INCOMING)
-            .setTrigger(Trigger.contentUriTrigger(observedUris()))
-            .setRecurring(true)
-            .setLifetime(FOREVER)
-            .setTag(CONTENT_TRIGGER_TAG)
-            .build();
-    }
+    @RequiresApi(Build.VERSION_CODES.N)
+    private Constraints contentTriggerConstraints() {
+        final Constraints.Builder builder = new Constraints.Builder()
+            .setRequiredNetworkType(networkType())
+            .addContentUriTrigger(SMS_PROVIDER, true);
 
-    private @NonNull List<ObservedUri> observedUris() {
-        List<ObservedUri> observedUris = new ArrayList<ObservedUri>();
-        observedUris.add(new ObservedUri(SMS_PROVIDER, FLAG_NOTIFY_FOR_DESCENDANTS));
-        if (preferences.getDataTypePreferences().isBackupEnabled(DataType.CALLLOG) && preferences.isCallLogBackupAfterCallEnabled()) {
-            observedUris.add(new ObservedUri(CALLLOG_PROVIDER, FLAG_NOTIFY_FOR_DESCENDANTS));
+        if (preferences.getDataTypePreferences().isBackupEnabled(DataType.CALLLOG)
+                && preferences.isCallLogBackupAfterCallEnabled()) {
+            builder.addContentUriTrigger(CALLLOG_PROVIDER, true);
         }
-        return observedUris;
+        return builder.build();
     }
 
-    private @NonNull Job.Builder createBuilder(BackupType backupType) {
-        return firebaseJobDispatcher.newJobBuilder()
-            .setReplaceCurrent(true)
-            .setService(SmsJobService.class)
-            .setTag(backupType.name())
-            .setRetryStrategy(defaultRetryStrategy())
-            .setConstraints(jobConstraints(backupType));
-    }
-
-    private int[] jobConstraints(BackupType backupType) {
-        switch (backupType) {
-            case BROADCAST_INTENT: return new int[0];
-            default:
-                return preferences.isWifiOnly() ? new int[] { ON_UNMETERED_NETWORK } : new int[] { ON_ANY_NETWORK };
-        }
-    }
-
-    // initial_backoff * 2 ^ (num_failures - 1) = [ 30, 60, 120, 240, 480, ... ]
-    private RetryStrategy defaultRetryStrategy() {
-        return firebaseJobDispatcher.newRetryStrategy(RETRY_POLICY_EXPONENTIAL,  30, 300);
+    private NetworkType networkType() {
+        return preferences.isWifiOnly() ? NetworkType.UNMETERED : NetworkType.CONNECTED;
     }
 }
