@@ -31,9 +31,9 @@ public class HeaderGeneratorTest {
         Map<String, String> map = new HashMap<String, String>();
         Date sent = new Date();
 
-        PersonRecord person = new PersonRecord(0, null, null, null);
+        String referenceId = "thread-1";
 
-        generator.setHeaders(message, map, DataType.SMS, "1234", person, sent, 0);
+        generator.setHeaders(message, map, DataType.SMS, "1234", referenceId, sent, 0);
 
         assertThat(get(message, Headers.ADDRESS)).isEqualTo("1234");
         assertThat(get(message, Headers.DATATYPE)).isEqualTo("SMS");
@@ -52,7 +52,7 @@ public class HeaderGeneratorTest {
         Map<String, String> map = new HashMap<String, String>();
         Date sent = new Date();
 
-        PersonRecord person = new PersonRecord(0, null, null, null);
+        String referenceId = "thread-1";
 
         map.put(android.provider.BaseColumns._ID, "someId");
         map.put(Telephony.TextBasedSmsColumns.TYPE, "type");
@@ -63,7 +63,7 @@ public class HeaderGeneratorTest {
         map.put(Telephony.TextBasedSmsColumns.PROTOCOL, "protocol");
         map.put(Telephony.TextBasedSmsColumns.SERVICE_CENTER, "svc");
 
-        generator.setHeaders(message, map, DataType.SMS, "1234", person, sent, 0);
+        generator.setHeaders(message, map, DataType.SMS, "1234", referenceId, sent, 0);
 
         assertThat(get(message, Headers.ID)).isEqualTo("someId");
         assertThat(get(message, Headers.TYPE)).isEqualTo("type");
@@ -80,14 +80,14 @@ public class HeaderGeneratorTest {
         Map<String, String> map = new HashMap<String, String>();
         Date sent = new Date();
 
-        PersonRecord person = new PersonRecord(0, null, null, null);
+        String referenceId = "thread-1";
 
         map.put(CallLog.Calls._ID, "id");
         map.put(CallLog.Calls.TYPE, "type");
         map.put(CallLog.Calls.DURATION, "duration");
         map.put(CallLog.Calls.DATE, "date");
 
-        generator.setHeaders(message, map, DataType.CALLLOG, "1234", person, sent, 0);
+        generator.setHeaders(message, map, DataType.CALLLOG, "1234", referenceId, sent, 0);
 
         assertThat(get(message, Headers.ID)).isEqualTo("id");
         assertThat(get(message, Headers.TYPE)).isEqualTo("type");
@@ -100,7 +100,7 @@ public class HeaderGeneratorTest {
         Map<String, String> map = new HashMap<String, String>();
         Date sent = new Date();
 
-        PersonRecord person = new PersonRecord(0, null, null, null);
+        String referenceId = "thread-1";
 
         map.put(Telephony.BaseMmsColumns._ID, "id");
         map.put(Telephony.BaseMmsColumns.MESSAGE_TYPE, "type");
@@ -108,7 +108,7 @@ public class HeaderGeneratorTest {
         map.put(Telephony.BaseMmsColumns.DATE, "date");
         map.put(Telephony.BaseMmsColumns.READ, "read");
 
-        generator.setHeaders(message, map, DataType.MMS, "1234", person, sent, 0);
+        generator.setHeaders(message, map, DataType.MMS, "1234", referenceId, sent, 0);
 
         assertThat(get(message, Headers.ID)).isEqualTo("id");
         assertThat(get(message, Headers.TYPE)).isEqualTo("type");
@@ -121,8 +121,8 @@ public class HeaderGeneratorTest {
         Message message = new MimeMessage();
         Map<String, String> map = new HashMap<String, String>();
         Date sent = new Date();
-        PersonRecord person = new PersonRecord(0, null, null, null);
+        String referenceId = "thread-1";
 
-        generator.setHeaders(message, map, DataType.SMS, null, person, sent, 0);
+        generator.setHeaders(message, map, DataType.SMS, null, referenceId, sent, 0);
     }
 }

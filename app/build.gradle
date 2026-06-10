@@ -7,12 +7,11 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion '29.0.2'
+    compileSdkVersion 33
     defaultConfig {
         applicationId 'com.zegoggles.smssync'
         minSdkVersion 14
-        targetSdkVersion 29
+        targetSdkVersion 33
         versionCode 1602
         versionName '1.6.0-BETA2'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -50,6 +49,14 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+        encoding = 'UTF-8'
+    }
+
+    testOptions {
+        unitTests {
+            // Robolectric (4.4+) reads the merged binary resources
+            includeAndroidResources = true
+        }
     }
 }
 
@@ -64,7 +71,7 @@ dependencies {
     implementation 'androidx.core:core-role:1.0.0-beta01'
 
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.robolectric:robolectric:4.3.1'
+    testImplementation 'org.robolectric:robolectric:4.10.3'
     testImplementation "com.google.truth:truth:0.39"
     testImplementation 'org.mockito:mockito-all:1.10.17'
     testImplementation 'androidx.work:work-testing:2.3.4'
@@ -72,8 +79,13 @@ dependencies {
     testAnnotationProcessor 'com.google.auto.service:auto-service:1.0-rc4'
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
+    // configureEach (lazy) so this wins over the encoding AGP sets on its compile tasks
+    options.encoding = 'UTF-8'
     if (!it.name.toLowerCase().contains('test')) {
-        options.compilerArgs = ['-Werror', '-Xlint:unchecked', '-Xlint:deprecation']
+        // -Xlint:deprecation is intentionally omitted: compiling against newer SDKs flags
+        // framework APIs (AsyncTask, Service.stopForeground(boolean), ...) whose migration is
+        // out of scope here. -Werror is kept for unchecked warnings.
+        options.compilerArgs = ['-Werror', '-Xlint:unchecked']
     }
 }

@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.3'
+        classpath 'com.android.tools.build:gradle:7.4.2'
     }
 }
 
@@ -15,6 +15,23 @@ allprojects {
         forkEvery = 100
         reports.html.required = false
         reports.junitXml.required = false
+        testLogging {
+            exceptionFormat = 'full'
+            showStackTraces = true
+        }
+        // JDK 17 on Windows defaults file.encoding to a locale charset (e.g. Cp1252); force UTF-8
+        // so byte<->String conversions in tests match the UTF-8 sources.
+        systemProperty 'file.encoding', 'UTF-8'
+        // Robolectric's bytecode instrumentation needs reflective access to java.base
+        // internals when running on JDK 17+.
+        jvmArgs += [
+            '--add-opens=java.base/java.lang=ALL-UNNAMED',
+            '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED',
+            '--add-opens=java.base/java.util=ALL-UNNAMED',
+            '--add-opens=java.base/java.io=ALL-UNNAMED',
+            '--add-opens=java.base/java.net=ALL-UNNAMED',
+            '--add-opens=java.base/java.text=ALL-UNNAMED'
+        ]
     }
 
     repositories {

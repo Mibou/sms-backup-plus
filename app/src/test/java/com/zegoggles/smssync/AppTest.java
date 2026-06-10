@@ -15,7 +15,7 @@ public class AppTest {
     }
 
     @Test public void shouldGetVersionCode() throws Exception {
-        assertThat(App.getVersionCode(RuntimeEnvironment.application)).isEqualTo(0);
+        assertThat(App.getVersionCode(RuntimeEnvironment.application)).isGreaterThan(0);
     }
 
     @Test public void shouldTestOnSDCARD() throws Exception {
