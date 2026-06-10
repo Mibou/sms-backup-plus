@@ -79,12 +79,12 @@ public class CalendarAccessorPost40 implements CalendarAccessor {
             cursor = resolver.query(CalendarContract.Calendars.CONTENT_URI,
                 new String[] {
                     CalendarContract.Calendars._ID,
-                    CalendarContract.Calendars.NAME,
+                    CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
                     CalendarContract.Calendars.SYNC_EVENTS
                 },
                 null,
                 null,
-                CalendarContract.Calendars.NAME + " ASC");
+                CalendarContract.Calendars.CALENDAR_DISPLAY_NAME + " ASC");
 
             while (cursor != null && cursor.moveToNext()) {
 
