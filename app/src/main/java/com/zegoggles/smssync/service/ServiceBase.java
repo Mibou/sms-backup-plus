@@ -198,10 +198,13 @@ public abstract class ServiceBase extends Service {
         if (extras != null) {
             intent.putExtras(extras);
         }
-         return PendingIntent.getActivity(getApplicationContext(),
-                 0,
-                 intent,
-                 FLAG_UPDATE_CURRENT);
+        // Targeting API 31+ requires an explicit mutability flag. The content intent does not
+        // need to be mutable. FLAG_IMMUTABLE exists from API 23 and is ignored on older platforms.
+        int flags = FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            flags |= PendingIntent.FLAG_IMMUTABLE;
+        }
+        return PendingIntent.getActivity(getApplicationContext(), 0, intent, flags);
     }
 
     boolean isConnectedViaWifi() {
