@@ -38,6 +38,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
+import static android.Manifest.permission.READ_CALENDAR;
 import static android.Manifest.permission.READ_CONTACTS;
 import static android.Manifest.permission.WRITE_CALENDAR;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
@@ -280,7 +281,8 @@ public abstract class AdvancedSettings extends SMSBackupPreferenceFragment {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
                         if (newValue == Boolean.TRUE && needCalendarPermission()) {
-                            requestPermissions(new String[] {WRITE_CALENDAR}, REQUEST_CALENDAR_ACCESS);
+                            // READ_CALENDAR is needed to list calendars, WRITE_CALENDAR to add events.
+                            requestPermissions(new String[] {READ_CALENDAR, WRITE_CALENDAR}, REQUEST_CALENDAR_ACCESS);
                             return false;
                         } else {
                             return true;
@@ -300,7 +302,8 @@ public abstract class AdvancedSettings extends SMSBackupPreferenceFragment {
             }
 
             private boolean needCalendarPermission() {
-                return ContextCompat.checkSelfPermission(getContext(), WRITE_CALENDAR) != PERMISSION_GRANTED;
+                return ContextCompat.checkSelfPermission(getContext(), READ_CALENDAR) != PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(getContext(), WRITE_CALENDAR) != PERMISSION_GRANTED;
             }
 
             private void updateCallLogCalendarLabelFromPref() {
