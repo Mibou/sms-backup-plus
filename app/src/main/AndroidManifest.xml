@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          package="com.zegoggles.smssync"
+          package="sms.backup.plus"
           android:description="@string/app_description">
 
     <!-- “dangerous” permissions -->
@@ -112,7 +112,7 @@
                 <action android:name="android.intent.action.EXTERNAL_APPLICATIONS_AVAILABLE"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="com.zegoggles.smssync" android:path="/oauth2redirect"
+                <data android:scheme="sms.backup.plus" android:path="/oauth2redirect"
                       tools:ignore="GoogleAppIndexingUrlError"/>
             </intent-filter>
         </activity>
@@ -146,7 +146,7 @@
 
         <receiver android:name=".receiver.BackupBroadcastReceiver" android:enabled="true" android:exported="true" tools:ignore="ExportedReceiver">
             <intent-filter>
-                <action android:name="com.zegoggles.smssync.BACKUP"/>
+                <action android:name="sms.backup.plus.BACKUP"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>

@@ -1,8 +1,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.zegoggles.smssync.activity.StatusPreference
-            xmlns:custom="http://schemas.android.com/apk/res/com.zegoggles.smssync"
+    <sms.backup.plus.activity.StatusPreference
+            xmlns:custom="http://schemas.android.com/apk/res-auto"
             android:selectable="false"
             android:persistent="false"
             android:layout="@layout/status"
@@ -13,8 +13,8 @@
     />
 
     <PreferenceScreen
-            android:fragment="com.zegoggles.smssync.activity.fragments.AdvancedSettings$Server"
-            android:key="com.zegoggles.smssync.activity.fragments.AdvancedSettings$Server"
+            android:fragment="sms.backup.plus.activity.fragments.AdvancedSettings$Server"
+            android:key="sms.backup.plus.activity.fragments.AdvancedSettings$Server"
             android:persistent="false"
             android:title="@string/imap_settings">
 
@@ -59,8 +59,8 @@
     </PreferenceScreen>
 
     <PreferenceScreen
-            android:fragment="com.zegoggles.smssync.activity.fragments.AdvancedSettings$Backup"
-            android:key="com.zegoggles.smssync.activity.fragments.AdvancedSettings$Backup"
+            android:fragment="sms.backup.plus.activity.fragments.AdvancedSettings$Backup"
+            android:key="sms.backup.plus.activity.fragments.AdvancedSettings$Backup"
             android:title="@string/ui_backup_settings_label">
 
         <CheckBoxPreference
@@ -82,8 +82,8 @@
                 android:defaultValue="false"/>
 
         <PreferenceScreen
-                android:fragment="com.zegoggles.smssync.activity.fragments.AdvancedSettings$Backup$CallLog"
-                android:key="com.zegoggles.smssync.activity.fragments.AdvancedSettings$Backup$CallLog"
+                android:fragment="sms.backup.plus.activity.fragments.AdvancedSettings$Backup$CallLog"
+                android:key="sms.backup.plus.activity.fragments.AdvancedSettings$Backup$CallLog"
                 android:persistent="false"
                 android:title="@string/ui_backup_calllog_settings_label">
 
@@ -175,8 +175,8 @@
             android:defaultValue="false"/>
 
     <PreferenceScreen
-            android:fragment="com.zegoggles.smssync.activity.fragments.AutoBackupSettings"
-            android:key="com.zegoggles.smssync.activity.fragments.AutoBackupSettings"
+            android:fragment="sms.backup.plus.activity.fragments.AutoBackupSettings"
+            android:key="sms.backup.plus.activity.fragments.AutoBackupSettings"
             android:persistent="false"
             android:title="@string/ui_auto_backup_settings_label">
 
@@ -210,15 +210,15 @@
     </PreferenceScreen>
 
     <PreferenceScreen
-            android:fragment="com.zegoggles.smssync.activity.fragments.AdvancedSettings$Main"
-            android:key="com.zegoggles.smssync.activity.fragments.AdvancedSettings$Main"
+            android:fragment="sms.backup.plus.activity.fragments.AdvancedSettings$Main"
+            android:key="sms.backup.plus.activity.fragments.AdvancedSettings$Main"
             android:persistent="false"
             android:title="@string/ui_settings_advanced_label"
             android:summary="@string/ui_settings_advanced_desc">
 
         <PreferenceScreen
-                android:fragment="com.zegoggles.smssync.activity.fragments.AdvancedSettings$Restore"
-                android:key="com.zegoggles.smssync.activity.fragments.AdvancedSettings$Restore"
+                android:fragment="sms.backup.plus.activity.fragments.AdvancedSettings$Restore"
+                android:key="sms.backup.plus.activity.fragments.AdvancedSettings$Restore"
                 android:title="@string/ui_restore_settings_label"
                 android:persistent="false">
 
@@ -312,7 +312,7 @@
             android:summary="@string/donate_summary"
             >
 
-        <intent android:targetClass="com.zegoggles.smssync.activity.donation.DonationActivity"
-                android:targetPackage="com.zegoggles.smssync"/>
+        <intent android:targetClass="sms.backup.plus.activity.donation.DonationActivity"
+                android:targetPackage="sms.backup.plus"/>
     </Preference>
 </PreferenceScreen>
