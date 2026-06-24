@@ -12,12 +12,14 @@ import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.PendingPurchasesParams;
+import com.android.billingclient.api.ProductDetails;
+import com.android.billingclient.api.ProductDetailsResponseListener;
 import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.Purchase.PurchasesResult;
+import com.android.billingclient.api.PurchasesResponseListener;
 import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsParams;
-import com.android.billingclient.api.SkuDetailsResponseListener;
+import com.android.billingclient.api.QueryProductDetailsParams;
+import com.android.billingclient.api.QueryPurchasesParams;
 import sms.backup.plus.BuildConfig;
 import sms.backup.plus.R;
 import sms.backup.plus.activity.ThemeActivity;
@@ -25,22 +27,14 @@ import sms.backup.plus.activity.donation.DonationListFragment.SkuSelectionListen
 import sms.backup.plus.utils.BundleBuilder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.widget.Toast.LENGTH_LONG;
 import static com.android.billingclient.api.BillingClient.BillingResponseCode.*;
-import static com.android.billingclient.api.BillingClient.BillingResponseCode.BILLING_UNAVAILABLE;
-import static com.android.billingclient.api.BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED;
-import static com.android.billingclient.api.BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED;
-import static com.android.billingclient.api.BillingClient.BillingResponseCode.ITEM_NOT_OWNED;
-import static com.android.billingclient.api.BillingClient.BillingResponseCode.ITEM_UNAVAILABLE;
-import static com.android.billingclient.api.BillingClient.BillingResponseCode.OK;
-import static com.android.billingclient.api.BillingClient.BillingResponseCode.SERVICE_DISCONNECTED;
-import static com.android.billingclient.api.BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE;
-import static com.android.billingclient.api.BillingClient.BillingResponseCode.USER_CANCELED;
-import static com.android.billingclient.api.BillingClient.SkuType.INAPP;
+import static com.android.billingclient.api.BillingClient.ProductType.INAPP;
 import static com.android.billingclient.api.Purchase.PurchaseState.PURCHASED;
 import static sms.backup.plus.App.TAG;
 import static sms.backup.plus.Consts.Billing.ALL_SKUS;
@@ -52,7 +46,7 @@ import static sms.backup.plus.activity.donation.DonationActivity.DonationStatusL
 import static sms.backup.plus.activity.donation.DonationListFragment.SKUS;
 
 public class DonationActivity extends ThemeActivity implements
-        SkuDetailsResponseListener,
+        ProductDetailsResponseListener,
         PurchasesUpdatedListener,
         SkuSelectionListener {
 
@@ -68,11 +62,15 @@ public class DonationActivity extends ThemeActivity implements
 
     private static boolean DEBUG_IAB = BuildConfig.DEBUG;
     private @Nullable BillingClient billingClient;
+    private final Map<String, ProductDetails> productDetails = new HashMap<>();
     private boolean stateSaved;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        billingClient = BillingClient.newBuilder(this).setListener(this).enablePendingPurchases().build();
+        billingClient = BillingClient.newBuilder(this)
+                .setListener(this)
+                .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+                .build();
         billingClient.startConnection(new BillingClientStateListener() {
 
             @Override public void onBillingSetupFinished(BillingResult resultCode) {
@@ -83,17 +81,6 @@ public class DonationActivity extends ThemeActivity implements
                         queryAvailableSkus();
                         break;
 
-                    case BILLING_UNAVAILABLE:
-                    case DEVELOPER_ERROR:
-                    case ERROR:
-                    case FEATURE_NOT_SUPPORTED:
-                    case ITEM_ALREADY_OWNED:
-                    case ITEM_NOT_OWNED:
-                    case ITEM_UNAVAILABLE:
-                    case SERVICE_DISCONNECTED:
-                    case SERVICE_UNAVAILABLE:
-                    case USER_CANCELED:
-                    case SERVICE_TIMEOUT:
                     default:
                         Toast.makeText(DonationActivity.this, R.string.donation_error_iab_unavailable, LENGTH_LONG).show();
                         Log.w(TAG, "Problem setting up in-app billing: " + resultCode);
@@ -124,8 +111,8 @@ public class DonationActivity extends ThemeActivity implements
     }
 
     @Override
-    public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> details) {
-        log("onSkuDetailsResponse(" + billingResult + ", " + details + ")");
+    public void onProductDetailsResponse(BillingResult billingResult, List<ProductDetails> details) {
+        log("onProductDetailsResponse(" + billingResult + ", " + details + ")");
         if (billingResult.getResponseCode() != OK) {
             Log.w(TAG, "failed to query inventory: " + billingResult);
             return;
@@ -136,13 +123,15 @@ public class DonationActivity extends ThemeActivity implements
             return;
         }
 
-        List<SkuDetails> skuDetailsList = new ArrayList<SkuDetails>();
-        for (SkuDetails d : details) {
-            if (d.getSku().startsWith(DONATION_PREFIX)) {
-                skuDetailsList.add(d);
+        productDetails.clear();
+        List<Sku> skuList = new ArrayList<Sku>();
+        for (ProductDetails d : details) {
+            if (d.getProductId().startsWith(DONATION_PREFIX)) {
+                productDetails.put(d.getProductId(), d);
+                skuList.add(new Sku(d));
             }
         }
-        showSelectDialog(skuDetailsList);
+        showSelectDialog(skuList);
     }
 
     /**
@@ -174,14 +163,6 @@ public class DonationActivity extends ThemeActivity implements
                 message = getString(R.string.ui_donation_failure_message,
                         getString(R.string.donation_error_canceled));
                 break;
-            case BILLING_UNAVAILABLE:
-            case FEATURE_NOT_SUPPORTED:
-            case ITEM_NOT_OWNED:
-            case SERVICE_DISCONNECTED:
-            case SERVICE_UNAVAILABLE:
-            case DEVELOPER_ERROR:
-            case ERROR:
-            case SERVICE_TIMEOUT:
             default:
                 message = getString(R.string.ui_donation_failure_message,
                         getString(R.string.donation_unspecified_error, result.getResponseCode()));
@@ -193,31 +174,42 @@ public class DonationActivity extends ThemeActivity implements
     }
 
     @Override
-    public void selectedSku(SkuDetails details) {
+    public void selectedSku(Sku sku) {
         if (billingClient == null) return;
         if (DEBUG_IAB) {
-            Log.v(TAG, "selectedSku("+details+")");
+            Log.v(TAG, "selectedSku("+sku.getSku()+")");
         }
+        ProductDetails details = productDetails.get(sku.getSku());
+        if (details == null) {
+            Log.w(TAG, "no product details for " + sku.getSku());
+            return;
+        }
+        BillingFlowParams.ProductDetailsParams params = BillingFlowParams.ProductDetailsParams.newBuilder()
+                .setProductDetails(details)
+                .build();
         billingClient.launchBillingFlow(this, BillingFlowParams.newBuilder()
-                .setSkuDetails(details)
+                .setProductDetailsParamsList(Collections.singletonList(params))
                 .build()
         );
     }
 
     private void queryAvailableSkus() {
         if (billingClient == null) return;
-        billingClient.querySkuDetailsAsync(SkuDetailsParams.newBuilder()
-            .setType(INAPP)
-            .setSkusList(Arrays.asList(ALL_SKUS))
-            .build(), this);
+        List<QueryProductDetailsParams.Product> products = new ArrayList<QueryProductDetailsParams.Product>();
+        for (String id : ALL_SKUS) {
+            products.add(QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId(id)
+                    .setProductType(INAPP)
+                    .build());
+        }
+        billingClient.queryProductDetailsAsync(QueryProductDetailsParams.newBuilder()
+                .setProductList(products)
+                .build(), this);
     }
 
-    private void showSelectDialog(List<SkuDetails> skuDetails) {
+    private void showSelectDialog(List<Sku> skuDetails) {
         if (billingClient == null) return;
-        ArrayList<Sku> skus = new ArrayList<Sku>(skuDetails.size());
-        for (SkuDetails detail : skuDetails) {
-            skus.add(new Sku(detail));
-        }
+        ArrayList<Sku> skus = new ArrayList<Sku>(skuDetails);
         if (DEBUG_IAB) {
             Collections.addAll(skus, Sku.Test.SKUS);
         }
@@ -256,7 +248,7 @@ public class DonationActivity extends ThemeActivity implements
     public static void checkUserDonationStatus(Context context,
                                                final DonationStatusListener listener) {
         final BillingClient helper = BillingClient.newBuilder(context)
-                .enablePendingPurchases()
+                .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
                 .setListener(new PurchasesUpdatedListener() {
             @Override
             public void onPurchasesUpdated(BillingResult result, @Nullable List<Purchase> purchases) {
@@ -266,23 +258,27 @@ public class DonationActivity extends ThemeActivity implements
         helper.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingSetupFinished(BillingResult result) {
-                    log("checkUserHasDonated: onBillingSetupFinished("+result+")");
-                try {
-                    if (result.getResponseCode() == OK) {
-                        PurchasesResult purchasesResult = helper.queryPurchases(INAPP);
-                        if (result.getResponseCode() == OK) {
-                            listener.userDonationState(userHasDonated(purchasesResult.getPurchasesList()) ? DONATED : NOT_DONATED);
-                        } else {
-                            listener.userDonationState(UNKNOWN);
-                        }
-                    } else {
-                        listener.userDonationState(result.getResponseCode() == BILLING_UNAVAILABLE ? NOT_AVAILABLE : UNKNOWN);
-                    }
-                } finally {
-                    try {
-                        helper.endConnection();
-                    } catch (Exception ignored) {
-                    }
+                log("checkUserHasDonated: onBillingSetupFinished("+result+")");
+                if (result.getResponseCode() == OK) {
+                    helper.queryPurchasesAsync(
+                            QueryPurchasesParams.newBuilder().setProductType(INAPP).build(),
+                            new PurchasesResponseListener() {
+                                @Override
+                                public void onQueryPurchasesResponse(BillingResult queryResult, List<Purchase> purchases) {
+                                    try {
+                                        if (queryResult.getResponseCode() == OK) {
+                                            listener.userDonationState(userHasDonated(purchases) ? DONATED : NOT_DONATED);
+                                        } else {
+                                            listener.userDonationState(UNKNOWN);
+                                        }
+                                    } finally {
+                                        endConnectionQuietly(helper);
+                                    }
+                                }
+                            });
+                } else {
+                    listener.userDonationState(result.getResponseCode() == BILLING_UNAVAILABLE ? NOT_AVAILABLE : UNKNOWN);
+                    endConnectionQuietly(helper);
                 }
             }
             public void onBillingServiceDisconnected() {
@@ -290,10 +286,17 @@ public class DonationActivity extends ThemeActivity implements
         });
     }
 
+    private static void endConnectionQuietly(BillingClient client) {
+        try {
+            client.endConnection();
+        } catch (Exception ignored) {
+        }
+    }
+
     private static boolean userHasDonated(List<Purchase> result) {
         for (String sku : ALL_SKUS) {
             for (Purchase purchase : result) {
-                if (purchase.getSku().equals(sku)) {
+                if (purchase.getProducts().contains(sku)) {
                     return true;
                 }
             }
@@ -301,4 +304,3 @@ public class DonationActivity extends ThemeActivity implements
         return false;
     }
 }
-

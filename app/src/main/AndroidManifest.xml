@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          package="sms.backup.plus"
           android:description="@string/app_description">
 
     <!-- “dangerous” permissions -->
@@ -78,6 +77,8 @@
 
     <!-- Apps wanting to use foreground services must now request the FOREGROUND_SERVICE permission first. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <!-- Android 14 (API 34) requires a typed foreground-service permission; backup/restore is a data sync. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
 
     <uses-feature android:name="android.hardware.telephony" android:required="false"/>
     <uses-feature android:name="android.hardware.wifi" android:required="false"/>
@@ -120,8 +121,10 @@
         <activity android:name=".activity.auth.AccountManagerAuthActivity"/>
         <activity android:name=".activity.donation.DonationActivity"/>
 
-        <service android:name=".service.SmsBackupService" android:exported="false"/>
-        <service android:name=".service.SmsRestoreService" android:exported="false"/>
+        <service android:name=".service.SmsBackupService" android:exported="false"
+                 android:foregroundServiceType="dataSync"/>
+        <service android:name=".service.SmsRestoreService" android:exported="false"
+                 android:foregroundServiceType="dataSync"/>
 
         <receiver android:name=".receiver.SmsBroadcastReceiver"
                   android:enabled="true"

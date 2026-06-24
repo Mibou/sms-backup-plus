@@ -10,11 +10,8 @@ import androidx.appcompat.app.AlertDialog;
 
 import android.text.TextUtils;
 
-import com.android.billingclient.api.SkuDetails;
 import sms.backup.plus.R;
 import sms.backup.plus.activity.Dialogs;
-
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +23,7 @@ public class DonationListFragment extends Dialogs.BaseFragment {
     private SkuSelectionListener listener;
 
     interface SkuSelectionListener {
-        void selectedSku(SkuDetails sku);
+        void selectedSku(Sku sku);
     }
 
     @Override
@@ -48,11 +45,7 @@ public class DonationListFragment extends Dialogs.BaseFragment {
             .setItems(getOptions(skus), new OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    try {
-                        listener.selectedSku(new SkuDetails(skus.get(which).getOriginalJson()));
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
+                    listener.selectedSku(skus.get(which));
                 }
             })
             .setNegativeButton(cancel, new OnClickListener() {

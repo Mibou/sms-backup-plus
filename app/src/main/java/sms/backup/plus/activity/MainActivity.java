@@ -175,19 +175,18 @@ public class MainActivity extends ThemeActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_about:
-                showDialog(ABOUT);
-                return true;
-            case R.id.menu_reset:
-                showDialog(RESET);
-                return true;
-            case R.id.menu_view_log:
-                showDialog(VIEW_LOG);
-
-            default:
-                return super.onOptionsItemSelected(item);
+        // AGP 8 makes R.id values non-final, so they can no longer be switch-case labels.
+        final int id = item.getItemId();
+        if (id == R.id.menu_about) {
+            showDialog(ABOUT);
+            return true;
+        } else if (id == R.id.menu_reset) {
+            showDialog(RESET);
+            return true;
+        } else if (id == R.id.menu_view_log) {
+            showDialog(VIEW_LOG);
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
