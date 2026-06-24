@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.github.triplet.play'
 
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('keystore.properties')
@@ -96,4 +97,21 @@ tasks.withType(JavaCompile).configureEach {
         // out of scope here. -Werror is kept for unchecked warnings.
         options.compilerArgs = ['-Werror', '-Xlint:unchecked']
     }
+}
+
+// Google Play Publisher (https://github.com/Triple-T/gradle-play-publisher).
+// Store listing + screenshots live under src/main/play (generated from metadata/play).
+play {
+    // The service-account JSON path is read from the gitignored keystore.properties
+    // (key: playCredentials), so the secret's location is never committed.
+    def playCreds = keystoreProperties['playCredentials']
+    if (playCreds) {
+        serviceAccountCredentials.set(rootProject.file(playCreds))
+    }
+    track.set('internal')
+    defaultToAppBundles.set(true)
+    releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.COMPLETED)
+    // Safety: only commit to Play when explicitly asked with -PplayCommit. Otherwise the
+    // publish tasks validate and upload to a Play "edit" but never commit it (dry run).
+    commit.set(project.hasProperty('playCommit'))
 }

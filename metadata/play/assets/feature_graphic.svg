@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4fb008"/>
+      <stop offset="0.55" stop-color="#439f06"/>
+      <stop offset="1" stop-color="#296304"/>
+    </linearGradient>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f1f1f1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="1024" height="500" fill="url(#bg)"/>
+
+  <!-- subtle decorative bubbles -->
+  <circle cx="930" cy="70" r="220" fill="#ffffff" opacity="0.06"/>
+  <circle cx="120" cy="470" r="180" fill="#ffffff" opacity="0.05"/>
+  <circle cx="690" cy="430" r="90" fill="#ffffff" opacity="0.05"/>
+
+  <!-- white icon tile -->
+  <rect x="72" y="100" width="300" height="300" rx="56" fill="url(#tile)"/>
+  <rect x="72" y="100" width="300" height="300" rx="56" fill="none" stroke="#000000" opacity="0.06"/>
+
+  <!-- app logo (envelope + speech bubble), original 10160 viewBox -->
+  <svg x="112" y="140" width="220" height="220" viewBox="0 0 10160 10160">
+    <path fill="#e93d2f" d="M643.2 6871.47l2367.77 1345.98L643.2 9547.16z"/>
+    <path fill="#a8251b" d="M5298.8 6871.47v2675.69H643.2z"/>
+    <path fill="#acaca2" d="M2991.62 5019.12L5298.8 6871.47 2956.23 8216.39 643.2 6871.47z"/>
+    <path fill="#439f06" d="M3598.13 983.95c0-350.02 145.83-492.88 503.08-492.88h5098.51c357.25 0 503.09 142.86 503.09 492.88v4012.1c0 350.02-145.84 492.88-503.09 492.88h-4235.1l-1126.27 900.19c-35.61 53.46-242.03 216.62-239.48-58.68l-.74-5346.49z"/>
+    <path fill="#f1f1f1" d="M8700.15 1708.33v466.83H4599.72v-466.83zM8700.15 2781.78v466.94H4599.72v-466.94zM7286.46 3823.33v466.94H4589.09v-466.94z"/>
+  </svg>
+
+  <!-- wordmark + tagline -->
+  <text x="430" y="196" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="72" font-weight="bold" fill="#ffffff">SMS Backup+</text>
+  <text x="432" y="252" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="28" fill="#ffffff" opacity="0.96">Back up &amp; restore SMS, MMS and call logs</text>
+  <text x="432" y="290" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="28" fill="#ffffff" opacity="0.96">to your own Gmail / IMAP mailbox.</text>
+
+  <!-- feature chips -->
+  <g font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="23" font-weight="bold" fill="#ffffff">
+    <rect x="432" y="328" width="108" height="42" rx="21" fill="#ffffff" opacity="0.16"/>
+    <text x="486" y="356" text-anchor="middle">Gmail</text>
+    <rect x="552" y="328" width="104" height="42" rx="21" fill="#ffffff" opacity="0.16"/>
+    <text x="604" y="356" text-anchor="middle">IMAP</text>
+    <rect x="668" y="328" width="142" height="42" rx="21" fill="#ffffff" opacity="0.16"/>
+    <text x="739" y="356" text-anchor="middle">Calendar</text>
+  </g>
+</svg>
