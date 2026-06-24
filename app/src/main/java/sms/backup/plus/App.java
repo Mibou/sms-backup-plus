@@ -56,7 +56,11 @@ public class App extends Application implements Configuration.Provider {
     public static final boolean LOCAL_LOGV = DEBUG;
     public static final String TAG = "SMSBackup+";
     public static final String LOG = "sms_backup_plus.log";
-    public static final String CHANNEL_ID = "sms_backup_plus";
+    // v2: the original "sms_backup_plus" channel used IMPORTANCE_DEFAULT and vibrated. Channel
+    // settings are locked after creation (and recreating the same id restores the user's previous
+    // settings), so a new id is used to switch the progress notification to a silent channel.
+    public static final String CHANNEL_ID = "sms_backup_plus_v2";
+    private static final String LEGACY_CHANNEL_ID = "sms_backup_plus";
 
     private static final Bus bus = new Bus();
     /** Google Play Services present on this device? */
@@ -176,10 +180,16 @@ public class App extends Application implements Configuration.Provider {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void createNotificationChannel() {
+        final NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        // drop the old vibrating channel from upgraded installs
+        notificationManager.deleteNotificationChannel(LEGACY_CHANNEL_ID);
+        // IMPORTANCE_LOW shows the ongoing backup/restore progress silently, without vibrating
         NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
                 "default",
-                NotificationManager.IMPORTANCE_DEFAULT);
-        NotificationManagerCompat.from(this).createNotificationChannel(channel);
+                NotificationManager.IMPORTANCE_LOW);
+        channel.enableVibration(false);
+        channel.setSound(null, null);
+        notificationManager.createNotificationChannel(channel);
     }
 
     private void setBroadcastReceiversEnabled(boolean enabled) {
