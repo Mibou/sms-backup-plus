@@ -14,8 +14,8 @@ android {
         applicationId 'sms.backup.plus'
         minSdk 21
         targetSdk 35
-        versionCode 1605
-        versionName '1.6.0-BETA5'
+        versionCode 1606
+        versionName '1.6.0-BETA6'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         ndk.abiFilters 'armeabi-v7a','arm64-v8a'
     }
