@@ -80,6 +80,9 @@
     <!-- Android 14 (API 34) requires a typed foreground-service permission; backup/restore is a data sync. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
 
+    <!-- Android 13 (API 33) requires runtime consent to post backup/restore progress notifications. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
     <uses-feature android:name="android.hardware.telephony" android:required="false"/>
     <uses-feature android:name="android.hardware.wifi" android:required="false"/>
 

@@ -16,10 +16,12 @@
 
 package sms.backup.plus.activity;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.role.RoleManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Telephony.Sms;
@@ -35,6 +37,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -61,6 +64,7 @@ import sms.backup.plus.activity.events.ThemeChangedEvent;
 import sms.backup.plus.activity.fragments.MainSettings;
 import sms.backup.plus.auth.OAuth2Client;
 import sms.backup.plus.compat.SmsReceiver;
+import sms.backup.plus.mail.DataType;
 import sms.backup.plus.preferences.AuthPreferences;
 import sms.backup.plus.preferences.Preferences;
 import sms.backup.plus.service.BackupType;
@@ -72,7 +76,10 @@ import sms.backup.plus.tasks.OAuth2CallbackTask;
 import sms.backup.plus.utils.BundleBuilder;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static android.provider.Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT;
 import static android.provider.Telephony.Sms.Intents.EXTRA_PACKAGE_NAME;
@@ -120,6 +127,7 @@ public class MainActivity extends ThemeActivity implements
     private static final int REQUEST_PERMISSIONS_BACKUP_MANUAL = 4;
     private static final int REQUEST_PERMISSIONS_BACKUP_MANUAL_SKIP = 5;
     private static final int REQUEST_PERMISSIONS_BACKUP_SERVICE = 6;
+    private static final int REQUEST_PERMISSIONS_STARTUP = 7;
 
     public static final String EXTRA_PERMISSIONS = "permissions";
     private static final String SCREEN_TITLE_RES = "titleRes";
@@ -151,7 +159,7 @@ public class MainActivity extends ThemeActivity implements
             showDialog(ABOUT);
         }
         checkDefaultSmsApp();
-        requestPermissionsIfNeeded();
+        requestPermissionsIfNeeded(bundle == null);
     }
 
     /**
@@ -485,12 +493,36 @@ public class MainActivity extends ThemeActivity implements
         }
     }
 
-    private void requestPermissionsIfNeeded() {
+    private void requestPermissionsIfNeeded(boolean firstCreate) {
         final Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_PERMISSIONS)) {
             final String[] permissions = intent.getStringArrayExtra(EXTRA_PERMISSIONS);
             Log.v(TAG, "requesting permissions "+ Arrays.toString(permissions));
             ActivityCompat.requestPermissions(this, permissions, REQUEST_PERMISSIONS_BACKUP_SERVICE);
+        } else if (firstCreate) {
+            requestStartupPermissions();
+        }
+    }
+
+    /**
+     * Proactively ask for every runtime permission the enabled backup types need, so the user
+     * grants them once at launch instead of being interrupted when starting a backup. Permissions
+     * that are already granted (or permanently denied) are skipped by the framework, so once they
+     * have been handled this no longer prompts.
+     */
+    private void requestStartupPermissions() {
+        final Set<String> missing = new LinkedHashSet<>();
+        for (DataType dataType : preferences.getDataTypePreferences().enabled()) {
+            missing.addAll(dataType.checkPermissions(this));
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+            missing.add(Manifest.permission.POST_NOTIFICATIONS);
+        }
+        if (!missing.isEmpty()) {
+            Log.v(TAG, "requesting startup permissions " + missing);
+            ActivityCompat.requestPermissions(this, missing.toArray(new String[0]), REQUEST_PERMISSIONS_STARTUP);
         }
     }
 
@@ -514,6 +546,17 @@ public class MainActivity extends ThemeActivity implements
                     startBackup(MANUAL);
                 } else {
                     post(new MissingPermissionsEvent(AppPermission.from(permissions, grantResults)));
+                }
+                break;
+            case REQUEST_PERMISSIONS_STARTUP:
+                // grantResults is empty when the request was cancelled; only surface real denials
+                if (grantResults.length > 0 && !allGranted(grantResults)) {
+                    final List<AppPermission> denied = AppPermission.from(permissions, grantResults);
+                    // POST_NOTIFICATIONS is optional (maps to UNKNOWN); it does not block a backup
+                    denied.removeAll(Collections.singletonList(AppPermission.UNKNOWN));
+                    if (!denied.isEmpty()) {
+                        post(new MissingPermissionsEvent(denied));
+                    }
                 }
                 break;
          }
