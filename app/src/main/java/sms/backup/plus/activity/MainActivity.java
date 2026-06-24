@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -34,6 +35,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -132,6 +136,7 @@ public class MainActivity extends ThemeActivity implements
         setContentView(R.layout.main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        applyWindowInsets(toolbar);
         getSupportFragmentManager().addOnBackStackChangedListener(this);
 
         authPreferences = new AuthPreferences(this);
@@ -147,6 +152,24 @@ public class MainActivity extends ThemeActivity implements
         }
         checkDefaultSmsApp();
         requestPermissionsIfNeeded();
+    }
+
+    /**
+     * Since {@code targetSdk} 35 Android forces edge-to-edge layout, so the toolbar would otherwise
+     * draw behind the (now transparent) status bar, overlapping the clock and status icons. Pad the
+     * toolbar down by the top system-bar inset (its background then colours the status bar area) and
+     * keep the preference list clear of the bottom navigation bar. On older platforms the insets are
+     * zero, so this is a no-op.
+     */
+    private void applyWindowInsets(Toolbar toolbar) {
+        final View content = findViewById(R.id.preferences_container);
+        ViewCompat.setOnApplyWindowInsetsListener(toolbar, (v, insets) -> {
+            Insets bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+            v.setPadding(bars.left, bars.top, bars.right, v.getPaddingBottom());
+            content.setPadding(bars.left, content.getPaddingTop(), bars.right, bars.bottom);
+            return insets;
+        });
     }
 
     @Override
