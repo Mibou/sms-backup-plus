@@ -70,18 +70,24 @@ public class SmsBackupWorker extends ListenableWorker {
                 complete(Result.success());
             } else if (shouldRun()) {
                 App.register(this);
-                // Since API level 26, an app in background cannot start a background service,
-                // so just instantiate the service manually.
-                // https://developer.android.com/about/versions/oreo/background.html#services
-                SmsBackupService service = new SmsBackupService();
-                service.attachBaseContext(getApplicationContext());
-                service.handleIntent(new Intent(backupType));
+                startBackup(backupType);
             } else {
                 Log.d(TAG, "skipping run");
                 complete(Result.success());
             }
             return "SmsBackupWorker:" + backupType;
         });
+    }
+
+    /**
+     * Starts the actual backup. Since API level 26, an app in the background cannot start a
+     * background service, so the service is instantiated manually.
+     * https://developer.android.com/about/versions/oreo/background.html#services
+     */
+    protected void startBackup(String backupType) {
+        SmsBackupService service = new SmsBackupService();
+        service.attachBaseContext(getApplicationContext());
+        service.handleIntent(new Intent(backupType));
     }
 
     /**
