@@ -125,6 +125,9 @@
   <string name="ui_imap_folder_calllog_label">Call log label</string>
   <string name="ui_imap_folder_calllog_label_dialog_msg">Backed up call log entries will be tagged with this label in Gmail.</string>
 
+  <string name="ui_backup_calllog_blocked_calls_label">Include blocked calls</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">Back up blocked calls in the call log</string>
+
   <string name="ui_backup_calllog_after_call_label">Backup after call</string>
   <string name="ui_backup_calllog_after_call_desc">Automatically backup after incoming/outgoing call (uses Incoming schedule).</string>
 
@@ -205,12 +208,16 @@
   <string name="call_missed">missed call</string>
   <string name="call_rejected">incoming call, rejected</string>
   <string name="call_voicemail">incoming call, voicemail</string>
+  <string name="call_blocked">blocked call</string>
+  <string name="call_answered_externally">answered externally</string>
 
   <string name="call_missed_text">Missed call from %1$s</string>
   <string name="call_incoming_text">Call from %1$s</string>
   <string name="call_outgoing_text">Called %1$s</string>
   <string name="call_rejected_text">Rejected call from %1$s</string>
   <string name="call_voicemail_text">Call from %1$s (voicemail)</string>
+  <string name="call_blocked_text">Blocked call from %1$s</string>
+  <string name="call_answered_externally_text">Call from %1$s (answered externally)</string>
 
   <string name="call_number_field">Number: %1$s</string>
   <string name="call_duration_field">Duration: %1$s</string>

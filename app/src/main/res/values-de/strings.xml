@@ -182,6 +182,8 @@
   <string name="call_outgoing_text">Anruf zu %1$s</string>
   <string name="call_blocked">Blockierter Anruf</string>
   <string name="call_blocked_text">Blockierter Anruf von %1$s</string>
+  <string name="ui_backup_calllog_blocked_calls_label">Blockierte Anrufe einschließen</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">Blockierte Anrufe im Anrufprotokoll sichern</string>
 
   <string name="call_number_field">Nummer: %1$s</string>
   <string name="call_duration_field">Dauer: %1$s</string>

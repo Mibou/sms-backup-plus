@@ -134,6 +134,8 @@
   <string name="call_outgoing_text">E thirrur %1$s</string>
   <string name="call_blocked">thirrje e bllokuar</string>
   <string name="call_blocked_text">Thirrje e bllokuar nga %1$s</string>
+  <string name="ui_backup_calllog_blocked_calls_label">Përfshi thirrjet e bllokuara</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">Ruaj kopje të thirrjeve të bllokuara në regjistrin e thirrjeve</string>
   <string name="call_number_field">Numri: %1$s</string>
   <string name="call_duration_field">Kohëzgjatja: %1$s</string>
   <string name="sms_with_field">SMS me %1$s</string>

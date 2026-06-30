@@ -134,6 +134,8 @@
 <string name="call_outgoing_text">Викликається %1$s</string>
 <string name="call_blocked">заблокований виклик</string>
 <string name="call_blocked_text">Заблокований виклик від %1$s</string>
+<string name="ui_backup_calllog_blocked_calls_label">Включити заблоковані виклики</string>
+<string name="ui_backup_calllog_blocked_calls_desc">Резервне копіювання заблокованих викликів з журналу викликів</string>
 <string name="call_number_field">Номер: %1$s</string>
 <string name="call_duration_field">Тривалість: %1$s</string>
 <string name="sms_with_field">SMS з %1$s</string>

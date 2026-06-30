@@ -47,6 +47,7 @@ class MessageGenerator {
     private final AddressStyle addressStyle;
     private final MmsSupport mmsSupport;
     private final CallLogTypes callLogTypes;
+    private final boolean backupBlockedCalls;
     private final DataTypePreferences dataTypePreferences;
 
     MessageGenerator(Context context,
@@ -58,6 +59,7 @@ class MessageGenerator {
                      @Nullable ContactGroupIds contactsToBackup,
                      MmsSupport mmsSupport,
                      CallLogTypes callLogTypes,
+                     boolean backupBlockedCalls,
                      DataTypePreferences dataTypePreferences) {
         this.headerGenerator = headerGenerator;
         this.userAddress = userAddress;
@@ -70,6 +72,7 @@ class MessageGenerator {
         this.mmsSupport = mmsSupport;
         this.dataTypePreferences = dataTypePreferences;
         this.callLogTypes = callLogTypes;
+        this.backupBlockedCalls = backupBlockedCalls;
     }
 
     public  @Nullable Message messageForDataType(Map<String, String> msgMap, DataType dataType) throws MessagingException {
@@ -195,6 +198,10 @@ class MessageGenerator {
             if (LOCAL_LOGV) Log.v(TAG, "ignoring call log entry: " + msgMap);
             return null;
         }
+        if (callType == CallLog.Calls.BLOCKED_TYPE && !backupBlockedCalls) {
+            if (LOCAL_LOGV) Log.v(TAG, "ignoring blocked call: " + msgMap);
+            return null;
+        }
         PersonRecord record = personLookup.lookupPerson(address);
         if (!includePersonInBackup(record, DataType.CALLLOG)) return null;
 
@@ -210,7 +217,8 @@ class MessageGenerator {
             case CallLog.Calls.INCOMING_TYPE:
             case CallLog.Calls.REJECTED_TYPE:
             case CallLog.Calls.VOICEMAIL_TYPE:
-
+            case CallLog.Calls.BLOCKED_TYPE:
+            case CallLog.Calls.ANSWERED_EXTERNALLY_TYPE:
                 msg.setFrom(record.getAddress(addressStyle));
                 msg.setRecipient(Message.RecipientType.TO, userAddress);
                 break;

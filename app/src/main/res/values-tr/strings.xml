@@ -210,6 +210,8 @@
   <string name="call_voicemail_text">Şu kişiden sesli mesaj: %1$s </string>
   <string name="call_blocked">engellenen çağrı</string>
   <string name="call_blocked_text">Şu kişiden engellenen çağrı: %1$s</string>
+  <string name="ui_backup_calllog_blocked_calls_label">Engellenen çağrıları dahil et</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">Arama kaydındaki engellenen çağrıları yedekle</string>
 
   <string name="call_number_field">Numara: %1$s</string>
   <string name="call_duration_field">Süre: %1$s</string>

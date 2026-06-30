@@ -187,6 +187,8 @@
   <string name="call_outgoing_text">Позван/а %1$s</string>
   <string name="call_blocked">блокирани позив</string>
   <string name="call_blocked_text">Блокиран позив од %1$s</string>
+  <string name="ui_backup_calllog_blocked_calls_label">Укључи блокиране позиве</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">Направи резервну копију блокираних позива из дневника позива</string>
 
   <string name="call_number_field">Број: %1$s</string>
   <string name="call_duration_field">Трајање: %1$s</string>

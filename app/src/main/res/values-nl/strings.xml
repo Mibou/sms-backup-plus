@@ -214,6 +214,8 @@
   <string name="call_voicemail_text">Oproep van %1$s (voicemail)</string>
   <string name="call_blocked">geblokkeerde oproep</string>
   <string name="call_blocked_text">Geblokkeerde oproep van %1$s</string>
+  <string name="ui_backup_calllog_blocked_calls_label">Geblokkeerde oproepen opnemen</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">Back-up van geblokkeerde oproepen in het oproeplogboek</string>
 
   <string name="call_number_field">Nummer: %1$s</string>
   <string name="call_duration_field">Tijd: %1$s</string>

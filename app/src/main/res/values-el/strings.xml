@@ -176,6 +176,8 @@
   <string name="call_outgoing_text">Κάλεσε %1$s</string>
   <string name="call_blocked">αποκλεισμένη κλήση</string>
   <string name="call_blocked_text">Αποκλεισμένη κλήση από %1$s</string>
+  <string name="ui_backup_calllog_blocked_calls_label">Συμπερίληψη αποκλεισμένων κλήσεων</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">Δημιουργία αντιγράφου ασφαλείας αποκλεισμένων κλήσεων στο αρχείο κλήσεων</string>
 
   <string name="call_number_field">Τηλέφωνο: %1$s</string>
   <string name="call_duration_field">Διάρκεια:  %1$s</string>

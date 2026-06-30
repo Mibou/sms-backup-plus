@@ -182,6 +182,8 @@
   <string name="call_outgoing_text">Appel à %1$s</string>
   <string name="call_blocked">appel bloqué</string>
   <string name="call_blocked_text">Appel bloqué de %1$s</string>
+  <string name="ui_backup_calllog_blocked_calls_label">Inclure les appels bloqués</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">Sauvegarder les appels bloqués du journal d\'appels</string>
 
   <string name="call_number_field">Numéro : %1$s</string>
   <string name="call_duration_field">Durée : %1$s</string>

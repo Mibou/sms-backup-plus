@@ -86,6 +86,7 @@ public class MessageConverter {
                 allowedIds,
                 new MmsSupport(context.getContentResolver(), personLookup),
                 preferences.getCallLogType(),
+                preferences.isCallLogBackupBlockedCallsEnabled(),
                 preferences.getDataTypePreferences());
     }
 

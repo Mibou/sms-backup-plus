@@ -103,6 +103,12 @@
                     android:entries="@array/backup_calllog_types_entries"
                     android:entryValues="@array/backup_calllog_types_values"/>
 
+            <CheckBoxPreference
+                    android:key="backup_calllog_blocked_calls"
+                    android:title="@string/ui_backup_calllog_blocked_calls_label"
+                    android:summary="@string/ui_backup_calllog_blocked_calls_desc"
+                    android:defaultValue="false"/>
+
             <!-- add call log entries to calendar -->
             <CheckBoxPreference
                     android:key="backup_calllog_sync_calendar_enabled"

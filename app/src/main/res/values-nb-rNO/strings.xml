@@ -181,6 +181,8 @@
   <string name="call_outgoing_text">Ringte %1$s</string>
   <string name="call_blocked">blokkert anrop</string>
   <string name="call_blocked_text">Blokkert anrop fra %1$s</string>
+  <string name="ui_backup_calllog_blocked_calls_label">Inkluder blokkerte anrop</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">Sikkerhetskopier blokkerte anrop i anropsloggen</string>
 
   <string name="call_number_field">Nummer: %1$s</string>
   <string name="call_duration_field">Lengde: %1$s</string>

@@ -210,6 +210,8 @@
   <string name="call_voicemail_text">自 %1$s 的來電（語音留言）</string>
   <string name="call_blocked">已封鎖來電</string>
   <string name="call_blocked_text">自 %1$s 的已封鎖來電</string>
+  <string name="ui_backup_calllog_blocked_calls_label">包含已封鎖來電</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">備份通話記錄中的已封鎖來電</string>
 
   <string name="call_number_field">號碼：%1$s</string>
   <string name="call_duration_field">時長：%1$s</string>

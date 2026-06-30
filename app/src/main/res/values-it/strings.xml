@@ -179,6 +179,8 @@
   <string name="call_outgoing_text">Chiamato %1$s</string>
   <string name="call_blocked">chiamata bloccata</string>
   <string name="call_blocked_text">Chiamata bloccata da %1$s</string>
+  <string name="ui_backup_calllog_blocked_calls_label">Includi chiamate bloccate</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">Backup delle chiamate bloccate nel registro chiamate</string>
 
   <string name="call_number_field">Numero: %1$s</string>
   <string name="call_duration_field">Durata: %1$s</string>

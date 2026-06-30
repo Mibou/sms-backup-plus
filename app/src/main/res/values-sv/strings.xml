@@ -210,6 +210,8 @@
   <string name="call_voicemail_text">Samtal från %1$s (röstbrevlåda)</string>
   <string name="call_blocked">blockerat samtal</string>
   <string name="call_blocked_text">Blockerat samtal från %1$s</string>
+  <string name="ui_backup_calllog_blocked_calls_label">Inkludera blockerade samtal</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">Säkerhetskopiera blockerade samtal i samtalsloggen</string>
 
   <string name="call_number_field">Nummer: %1$s</string>
   <string name="call_duration_field">Samtalstid: %1$s</string>

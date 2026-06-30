@@ -170,6 +170,8 @@
   <string name="call_incoming_text">Llamada de %1$s</string>
   <string name="call_outgoing_text">Llamada a %1$s</string>
   <string name="call_blocked_text">Llamada bloqueada de %1$s</string>
+  <string name="ui_backup_calllog_blocked_calls_label">Incluir llamadas bloqueadas</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">Respaldar llamadas bloqueadas en el registro de llamadas</string>
 
   <string name="email_address_style_name">Nombre</string>
   <string name="email_address_style_name_and_number">Nombre (+00 123456)</string>

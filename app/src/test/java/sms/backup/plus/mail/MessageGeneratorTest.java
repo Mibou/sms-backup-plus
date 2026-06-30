@@ -59,6 +59,7 @@ public class MessageGeneratorTest {
                 null,
                 mmsSupport,
                 CallLogTypes.EVERYTHING,
+                false,
                 dataTypePreferences
         );
     }
@@ -232,6 +233,7 @@ public class MessageGeneratorTest {
                 groupIds,
                 mmsSupport,
                 CallLogTypes.EVERYTHING,
+                false,
                 dataTypePreferences
         );
         PersonRecord record = new PersonRecord(1, "Test Testor", "test@test.com", "1234");

@@ -179,6 +179,8 @@
   <string name="call_outgoing_text">Opkald til %1$s</string>
   <string name="call_blocked">blokeret opkald</string>
   <string name="call_blocked_text">Blokeret opkald fra %1$s</string>
+  <string name="ui_backup_calllog_blocked_calls_label">Inkluder blokerede opkald</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">Sikkerhedskopier blokerede opkald i opkaldsloggen</string>
 
   <string name="call_number_field">Nummer: %1$s</string>
   <string name="call_duration_field">Varighed: %1$s</string>

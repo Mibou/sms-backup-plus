@@ -34,6 +34,7 @@ import static sms.backup.plus.preferences.Preferences.Keys.APP_LOG;
 import static sms.backup.plus.preferences.Preferences.Keys.APP_LOG_DEBUG;
 import static sms.backup.plus.preferences.Preferences.Keys.BACKUP_CONTACT_GROUP;
 import static sms.backup.plus.preferences.Preferences.Keys.CALLLOG_BACKUP_AFTER_CALL;
+import static sms.backup.plus.preferences.Preferences.Keys.CALLLOG_BACKUP_BLOCKED_CALLS;
 import static sms.backup.plus.preferences.Preferences.Keys.CALLLOG_SYNC_CALENDAR;
 import static sms.backup.plus.preferences.Preferences.Keys.CALLLOG_SYNC_CALENDAR_ENABLED;
 import static sms.backup.plus.preferences.Preferences.Keys.CONFIRM_ACTION;
@@ -81,6 +82,7 @@ public class Preferences {
         CALLLOG_SYNC_CALENDAR ("backup_calllog_sync_calendar"),
         CALLLOG_SYNC_CALENDAR_ENABLED ("backup_calllog_sync_calendar_enabled"),
         CALLLOG_BACKUP_AFTER_CALL ("backup_calllog_after_call"),
+        CALLLOG_BACKUP_BLOCKED_CALLS ("backup_calllog_blocked_calls"),
         BACKUP_CONTACT_GROUP("backup_contact_group"),
         CONNECTED("connected"),
         WIFI_ONLY("wifi_only"),
@@ -133,6 +135,10 @@ public class Preferences {
 
     public boolean isCallLogBackupAfterCallEnabled() {
         return preferences.getBoolean(CALLLOG_BACKUP_AFTER_CALL.key, false);
+    }
+
+    public boolean isCallLogBackupBlockedCallsEnabled() {
+        return preferences.getBoolean(CALLLOG_BACKUP_BLOCKED_CALLS.key, false);
     }
 
     public int getCallLogCalendarId() {

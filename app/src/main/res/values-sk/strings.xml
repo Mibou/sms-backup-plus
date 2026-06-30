@@ -123,6 +123,8 @@ Poznámka: Záloha bude rozdelená do dávok po %1$d správach"</string>
     <string name="call_outgoing_text">Volané %1$s</string>
     <string name="call_blocked">zablokovaný hovor</string>
     <string name="call_blocked_text">Zablokovaný hovor od %1$s</string>
+    <string name="ui_backup_calllog_blocked_calls_label">Zahrnúť zablokované hovory</string>
+    <string name="ui_backup_calllog_blocked_calls_desc">Zálohovať zablokované hovory v zázname hovorov</string>
     <string name="call_number_field">Číslo: %1$s</string>
     <string name="call_duration_field">Trvanie: %1$s</string>
     <string name="sms_with_field">SMS od %1$s</string>

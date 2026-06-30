@@ -208,6 +208,8 @@
   <string name="call_voicemail_text">自 %1$s 的来电（语音邮件）</string>
   <string name="call_blocked">已拦截来电</string>
   <string name="call_blocked_text">自 %1$s 的已拦截来电</string>
+  <string name="ui_backup_calllog_blocked_calls_label">包含已拦截来电</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">备份通话记录中的已拦截来电</string>
 
   <string name="call_number_field">号码：%1$s</string>
   <string name="call_duration_field">时长：%1$s</string>

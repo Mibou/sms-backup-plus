@@ -164,6 +164,8 @@
   <string name="call_incoming_text">Hovor od %1$s</string>
   <string name="call_outgoing_text">Voláno %1$s</string>
   <string name="call_blocked_text">Zablokovaný hovor od %1$s</string>
+  <string name="ui_backup_calllog_blocked_calls_label">Zahrnout zablokované hovory</string>
+  <string name="ui_backup_calllog_blocked_calls_desc">Zálohovat zablokované hovory v záznamu hovorů</string>
 
   <string name="call_type_everything">Vše</string>
   <string name="call_type_incoming">Pouze příchozí hovory</string>
