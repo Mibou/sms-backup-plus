@@ -80,10 +80,11 @@ public class CalendarAccessorPost40 implements CalendarAccessor {
                 new String[] {
                     CalendarContract.Calendars._ID,
                     CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
-                    CalendarContract.Calendars.SYNC_EVENTS
+                    CalendarContract.Calendars.SYNC_EVENTS,
+                    CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL
                 },
-                null,
-                null,
+                CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL + " >= ?",
+                new String[] { String.valueOf(CalendarContract.Calendars.CAL_ACCESS_CONTRIBUTOR) },
                 CalendarContract.Calendars.CALENDAR_DISPLAY_NAME + " ASC");
 
             while (cursor != null && cursor.moveToNext()) {
