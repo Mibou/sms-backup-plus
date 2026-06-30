@@ -161,6 +161,16 @@
 
   <string name="ui_connected_label">Conectar</string>
 
+  <string name="call_incoming">llamada entrante</string>
+  <string name="call_outgoing">llamada saliente</string>
+  <string name="call_missed">llamada perdida</string>
+  <string name="call_blocked">llamada bloqueada</string>
+
+  <string name="call_missed_text">Llamada perdida de %1$s</string>
+  <string name="call_incoming_text">Llamada de %1$s</string>
+  <string name="call_outgoing_text">Llamada a %1$s</string>
+  <string name="call_blocked_text">Llamada bloqueada de %1$s</string>
+
   <string name="email_address_style_name">Nombre</string>
   <string name="email_address_style_name_and_number">Nombre (+00 123456)</string>
   <string name="email_address_style_number">+00 123456</string>

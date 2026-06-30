@@ -125,6 +125,8 @@
   <string name="call_missed_text">Chamada não atendida de %1$s</string>
   <string name="call_incoming_text">Chamada de %1$s</string>
   <string name="call_outgoing_text">Chamada para %1$s</string>
+  <string name="call_blocked">Chamada bloqueada</string>
+  <string name="call_blocked_text">Chamada bloqueada de %1$s</string>
   <string name="call_number_field">Número: %1$s</string>
   <string name="call_duration_field">Duração: %1$s</string>
   <string name="sms_with_field">SMS com %1$s</string>

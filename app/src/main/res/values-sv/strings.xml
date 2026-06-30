@@ -208,6 +208,8 @@
   <string name="call_outgoing_text">Samtal till %1$s</string>
   <string name="call_rejected_text">Avvisat samtal från %1$s</string>
   <string name="call_voicemail_text">Samtal från %1$s (röstbrevlåda)</string>
+  <string name="call_blocked">blockerat samtal</string>
+  <string name="call_blocked_text">Blockerat samtal från %1$s</string>
 
   <string name="call_number_field">Nummer: %1$s</string>
   <string name="call_duration_field">Samtalstid: %1$s</string>

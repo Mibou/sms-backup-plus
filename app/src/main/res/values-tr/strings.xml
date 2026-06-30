@@ -208,6 +208,8 @@
   <string name="call_outgoing_text">Arayan: %1$s</string>
   <string name="call_rejected_text">Şu kişiden reddedilmiş çağrı: %1$s</string>
   <string name="call_voicemail_text">Şu kişiden sesli mesaj: %1$s </string>
+  <string name="call_blocked">engellenen çağrı</string>
+  <string name="call_blocked_text">Şu kişiden engellenen çağrı: %1$s</string>
 
   <string name="call_number_field">Numara: %1$s</string>
   <string name="call_duration_field">Süre: %1$s</string>

@@ -209,6 +209,8 @@
   <string name="call_outgoing_text">%1$s에게 건 통화</string>
   <string name="call_rejected_text">%1$s로부터 온 거절된 통화</string>
   <string name="call_voicemail_text">%1$s로부터 온 통화 (음성메시지)</string>
+  <string name="call_blocked">차단된 통화</string>
+  <string name="call_blocked_text">%1$s의 차단된 통화</string>
 
   <string name="call_number_field">번호: %1$s</string>
   <string name="call_duration_field">통화시간: %1$s</string>

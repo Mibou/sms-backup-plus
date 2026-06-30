@@ -181,6 +181,8 @@
   <string name="call_missed_text">Trucada perduda de %1$s</string>
   <string name="call_incoming_text">Trucada de %1$s</string>
   <string name="call_outgoing_text">Es va trucar %1$s</string>
+  <string name="call_blocked">trucada bloquejada</string>
+  <string name="call_blocked_text">Trucada bloquejada de %1$s</string>
 
   <string name="call_number_field">Número: %1$s</string>
   <string name="call_duration_field">Durada: %1$s</string>

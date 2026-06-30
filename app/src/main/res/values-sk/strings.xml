@@ -121,6 +121,8 @@ Poznámka: Záloha bude rozdelená do dávok po %1$d správach"</string>
     <string name="call_missed_text">Zmeškaný hovor od %1$s</string>
     <string name="call_incoming_text">Hovor od %1$s</string>
     <string name="call_outgoing_text">Volané %1$s</string>
+    <string name="call_blocked">zablokovaný hovor</string>
+    <string name="call_blocked_text">Zablokovaný hovor od %1$s</string>
     <string name="call_number_field">Číslo: %1$s</string>
     <string name="call_duration_field">Trvanie: %1$s</string>
     <string name="sms_with_field">SMS od %1$s</string>

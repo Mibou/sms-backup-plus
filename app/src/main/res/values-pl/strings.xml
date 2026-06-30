@@ -122,6 +122,8 @@
     <string name="call_missed_text">Nieodebrane połączenie od %1$s</string>
     <string name="call_incoming_text">Połączenie od %1$s</string>
     <string name="call_outgoing_text">Połączenie do %1$s</string>
+    <string name="call_blocked">zablokowane połączenie</string>
+    <string name="call_blocked_text">Zablokowane połączenie od %1$s</string>
     <string name="call_number_field">Numer: %1$s</string>
     <string name="call_duration_field">Czas połączenia: %1$s</string>
     <string name="sms_with_field">SMS od %1$s</string>

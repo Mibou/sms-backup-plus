@@ -183,6 +183,8 @@
   <string name="call_missed_text">Nem fogadott hívás: %1$s</string>
   <string name="call_incoming_text">Bejövő hívás: %1$s</string>
   <string name="call_outgoing_text">Kimenő hívás: %1$s</string>
+  <string name="call_blocked">blokkolt hívás</string>
+  <string name="call_blocked_text">Blokkolt hívás: %1$s</string>
 
   <string name="call_number_field">Telefonszám: %1$s</string>
   <string name="call_duration_field">Hossz: %1$s</string>

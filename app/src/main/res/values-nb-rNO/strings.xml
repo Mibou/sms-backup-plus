@@ -179,6 +179,8 @@
   <string name="call_missed_text">Tapt anrop fra %1$s</string>
   <string name="call_incoming_text">Anrop fra %1$s</string>
   <string name="call_outgoing_text">Ringte %1$s</string>
+  <string name="call_blocked">blokkert anrop</string>
+  <string name="call_blocked_text">Blokkert anrop fra %1$s</string>
 
   <string name="call_number_field">Nummer: %1$s</string>
   <string name="call_duration_field">Lengde: %1$s</string>

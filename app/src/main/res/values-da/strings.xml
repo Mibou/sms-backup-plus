@@ -177,6 +177,8 @@
   <string name="call_missed_text">Ubesvaret opkald fra %1$s</string>
   <string name="call_incoming_text">Opkald fra %1$s</string>
   <string name="call_outgoing_text">Opkald til %1$s</string>
+  <string name="call_blocked">blokeret opkald</string>
+  <string name="call_blocked_text">Blokeret opkald fra %1$s</string>
 
   <string name="call_number_field">Nummer: %1$s</string>
   <string name="call_duration_field">Varighed: %1$s</string>

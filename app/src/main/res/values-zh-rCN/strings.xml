@@ -206,6 +206,8 @@
   <string name="call_outgoing_text">至 %1$s 的去电</string>
   <string name="call_rejected_text">自 %1$s 的拒接来电</string>
   <string name="call_voicemail_text">自 %1$s 的来电（语音邮件）</string>
+  <string name="call_blocked">已拦截来电</string>
+  <string name="call_blocked_text">自 %1$s 的已拦截来电</string>
 
   <string name="call_number_field">号码：%1$s</string>
   <string name="call_duration_field">时长：%1$s</string>

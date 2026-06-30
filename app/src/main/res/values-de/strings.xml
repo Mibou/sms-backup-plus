@@ -180,6 +180,8 @@
   <string name="call_missed_text">Verpasster Anruf von %1$s</string>
   <string name="call_incoming_text">Anruf von %1$s</string>
   <string name="call_outgoing_text">Anruf zu %1$s</string>
+  <string name="call_blocked">Blockierter Anruf</string>
+  <string name="call_blocked_text">Blockierter Anruf von %1$s</string>
 
   <string name="call_number_field">Nummer: %1$s</string>
   <string name="call_duration_field">Dauer: %1$s</string>

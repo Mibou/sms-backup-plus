@@ -208,6 +208,8 @@
   <string name="call_outgoing_text">至 %1$s 的去電</string>
   <string name="call_rejected_text">自 %1$s 的拒接來電</string>
   <string name="call_voicemail_text">自 %1$s 的來電（語音留言）</string>
+  <string name="call_blocked">已封鎖來電</string>
+  <string name="call_blocked_text">自 %1$s 的已封鎖來電</string>
 
   <string name="call_number_field">號碼：%1$s</string>
   <string name="call_duration_field">時長：%1$s</string>

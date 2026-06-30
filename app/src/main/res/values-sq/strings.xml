@@ -132,6 +132,8 @@
   <string name="call_missed_text">Thirrje e humbur nga %1$s</string>
   <string name="call_incoming_text">Thirrje nga %1$s</string>
   <string name="call_outgoing_text">E thirrur %1$s</string>
+  <string name="call_blocked">thirrje e bllokuar</string>
+  <string name="call_blocked_text">Thirrje e bllokuar nga %1$s</string>
   <string name="call_number_field">Numri: %1$s</string>
   <string name="call_duration_field">Kohëzgjatja: %1$s</string>
   <string name="sms_with_field">SMS me %1$s</string>

@@ -212,6 +212,8 @@
   <string name="call_outgoing_text">Gebeld naar %1$s</string>
   <string name="call_rejected_text">Geweigered oproep van %1$s</string>
   <string name="call_voicemail_text">Oproep van %1$s (voicemail)</string>
+  <string name="call_blocked">geblokkeerde oproep</string>
+  <string name="call_blocked_text">Geblokkeerde oproep van %1$s</string>
 
   <string name="call_number_field">Nummer: %1$s</string>
   <string name="call_duration_field">Tijd: %1$s</string>

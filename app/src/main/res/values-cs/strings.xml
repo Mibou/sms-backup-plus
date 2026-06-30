@@ -155,6 +155,16 @@
 
   <string name="ui_connected_label">Připojit</string>
 
+  <string name="call_incoming">příchozí hovor</string>
+  <string name="call_outgoing">odchozí hovor</string>
+  <string name="call_missed">zmeškaný hovor</string>
+  <string name="call_blocked">zablokovaný hovor</string>
+
+  <string name="call_missed_text">Zmeškaný hovor od %1$s</string>
+  <string name="call_incoming_text">Hovor od %1$s</string>
+  <string name="call_outgoing_text">Voláno %1$s</string>
+  <string name="call_blocked_text">Zablokovaný hovor od %1$s</string>
+
   <string name="call_type_everything">Vše</string>
   <string name="call_type_incoming">Pouze příchozí hovory</string>
   <string name="call_type_outgoing">Pouze odchozí hovory</string>
