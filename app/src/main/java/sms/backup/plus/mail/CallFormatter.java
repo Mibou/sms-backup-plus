@@ -16,7 +16,8 @@ public class CallFormatter {
     public String format(int callType, String number, int duration) {
         final StringBuilder text = new StringBuilder();
 
-        if (callType != CallLog.Calls.MISSED_TYPE && callType != CallLog.Calls.REJECTED_TYPE) {
+        if (callType != CallLog.Calls.MISSED_TYPE && callType != CallLog.Calls.REJECTED_TYPE
+                && callType != CallLog.Calls.BLOCKED_TYPE && callType != CallLog.Calls.ANSWERED_EXTERNALLY_TYPE) {
             text.append(duration)
                     .append("s")
                     .append(" (").append(formattedCallDuration(duration)).append(")")
@@ -37,7 +38,8 @@ public class CallFormatter {
                 .append(")")
                 .append("\n");
 
-        if (callType != CallLog.Calls.MISSED_TYPE) {
+        if (callType != CallLog.Calls.MISSED_TYPE && callType != CallLog.Calls.BLOCKED_TYPE
+                && callType != CallLog.Calls.ANSWERED_EXTERNALLY_TYPE) {
             description.append(resources.getString(R.string.call_duration_field,
                     formattedCallDuration(duration)));
         }
@@ -66,6 +68,8 @@ public class CallFormatter {
             case CallLog.Calls.MISSED_TYPE: return R.string.call_missed;
             case CallLog.Calls.REJECTED_TYPE: return R.string.call_rejected;
             case CallLog.Calls.VOICEMAIL_TYPE: return R.string.call_voicemail;
+            case CallLog.Calls.BLOCKED_TYPE: return R.string.call_blocked;
+            case CallLog.Calls.ANSWERED_EXTERNALLY_TYPE: return R.string.call_answered_externally;
             default:
                 return R.string.call_incoming;
         }
@@ -78,6 +82,8 @@ public class CallFormatter {
             case CallLog.Calls.MISSED_TYPE: return R.string.call_missed_text;
             case CallLog.Calls.REJECTED_TYPE: return R.string.call_rejected_text;
             case CallLog.Calls.VOICEMAIL_TYPE: return R.string.call_voicemail_text;
+            case CallLog.Calls.BLOCKED_TYPE: return R.string.call_blocked_text;
+            case CallLog.Calls.ANSWERED_EXTERNALLY_TYPE: return R.string.call_answered_externally_text;
             default:
                 return R.string.call_incoming_text;
         }
