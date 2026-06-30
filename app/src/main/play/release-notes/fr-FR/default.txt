@@ -1,0 +1,3 @@
+• Ajout d'une option pour inclure les appels bloqués dans la sauvegarde du journal d'appels
+• Correction du nom d'affichage du calendrier sur Android 15
+• Ajout du formatage pour les appels bloqués et répondus en externe

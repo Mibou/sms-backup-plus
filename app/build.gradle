@@ -14,8 +14,8 @@ android {
         applicationId 'sms.backup.plus'
         minSdk 21
         targetSdk 35
-        versionCode 1608
-        versionName '1.6.0-BETA8'
+        versionCode 1609
+        versionName '1.6.0-BETA9'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         ndk.abiFilters 'armeabi-v7a','arm64-v8a'
     }
@@ -30,6 +30,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            signingConfig keystoreProperties['storePassword'] ? signingConfigs.release : null
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -108,9 +111,14 @@ play {
     if (playCreds) {
         serviceAccountCredentials.set(rootProject.file(playCreds))
     }
-    track.set('internal')
+    // Track defaults to 'internal'; override per-invocation with -PplayTrack=alpha (closed
+    // testing), -PplayTrack=beta (open testing), or -PplayTrack=production.
+    track.set(project.findProperty('playTrack') ?: 'internal')
     defaultToAppBundles.set(true)
-    releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.COMPLETED)
+    // Release status defaults to 'completed'; override with -PplayReleaseStatus=draft. A Play
+    // app that has never had a first production release ("draft app") only accepts draft releases.
+    releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.valueOf(
+        (project.findProperty('playReleaseStatus') ?: 'completed').toString().toUpperCase()))
     // Safety: only commit to Play when explicitly asked with -PplayCommit. Otherwise the
     // publish tasks validate and upload to a Play "edit" but never commit it (dry run).
     commit.set(project.hasProperty('playCommit'))

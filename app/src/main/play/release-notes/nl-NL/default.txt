@@ -1,0 +1,3 @@
+• Optie toegevoegd om geblokkeerde oproepen op te nemen in de back-up van het oproeplogboek
+• Weergavenaam van agenda hersteld op Android 15
+• Opmaakondersteuning toegevoegd voor geblokkeerde en extern beantwoorde oproepen

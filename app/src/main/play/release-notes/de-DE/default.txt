@@ -1,0 +1,3 @@
+• Option zum Einschließen blockierter Anrufe in der Anrufprotokoll-Sicherung hinzugefügt
+• Kalender-Anzeigename auf Android 15 behoben
+• Formatierungsunterstützung für blockierte und extern angenommene Anrufe hinzugefügt

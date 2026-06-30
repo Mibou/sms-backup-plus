@@ -1,0 +1,3 @@
+• Tilføjet mulighed for at inkludere blokerede opkald i sikkerhedskopiering af opkaldslog
+• Rettet kalendervisningsnavn på Android 15
+• Tilføjet formateringsunderstøttelse for blokerede og eksternt besvarede opkald

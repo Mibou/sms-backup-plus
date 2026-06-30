@@ -1,0 +1,3 @@
+• Added option to include blocked calls in call log backup
+• Fixed calendar display name on Android 15
+• Added formatting support for blocked and answered-externally call types

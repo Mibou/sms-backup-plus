@@ -1,0 +1,3 @@
+• Arama kaydı yedeklemesine engellenen çağrıları dahil etme seçeneği eklendi
+• Android 15'te takvim görünen adı düzeltildi
+• Engellenen ve harici olarak yanıtlanan çağrılar için biçimlendirme desteği eklendi

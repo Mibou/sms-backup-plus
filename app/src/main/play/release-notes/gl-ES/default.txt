@@ -1,0 +1,3 @@
+• Engadiuse a opción de incluír chamadas bloqueadas na copia de seguridade do rexistro de chamadas
+• Corrixiuse o nome de visualización do calendario en Android 15
+• Engadiuse soporte de formato para chamadas bloqueadas e respondidas externamente

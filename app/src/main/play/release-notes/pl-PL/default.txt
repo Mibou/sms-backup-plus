@@ -1,0 +1,3 @@
+• Dodano opcję uwzględniania zablokowanych połączeń w kopii zapasowej rejestru połączeń
+• Naprawiono nazwę wyświetlaną kalendarza na Androidzie 15
+• Dodano obsługę formatowania połączeń zablokowanych i odebranych zewnętrznie
