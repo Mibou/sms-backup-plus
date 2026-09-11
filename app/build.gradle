@@ -9,11 +9,11 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace 'sms.backup.plus'
-    compileSdk 35
+    compileSdk 36
     defaultConfig {
         applicationId 'sms.backup.plus'
         minSdk 21
-        targetSdk 35
+        targetSdk 36
         versionCode 1609
         versionName '1.6.0-BETA9'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -44,6 +44,10 @@ android {
 
     lint {
         warningsAsErrors true
+        // Pre-existing issues surfaced when the lint tool was upgraded (AGP 8.9). The baseline
+        // records them so warningsAsErrors keeps gating genuinely new issues; the backlog can be
+        // burned down separately.
+        baseline = file('lint-baseline.xml')
     }
 
     //  avoid "Duplicate files copied in APK META-INF/"
