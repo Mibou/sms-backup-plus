@@ -19,6 +19,7 @@ import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesResponseListener;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
+import com.android.billingclient.api.QueryProductDetailsResult;
 import com.android.billingclient.api.QueryPurchasesParams;
 import sms.backup.plus.BuildConfig;
 import sms.backup.plus.R;
@@ -110,9 +111,11 @@ public class DonationActivity extends ThemeActivity implements
         stateSaved = true;
     }
 
+    // Play Billing 8.0.0 changed this callback to deliver a QueryProductDetailsResult
+    // (product list + unfetched products) instead of a bare List<ProductDetails>.
     @Override
-    public void onProductDetailsResponse(BillingResult billingResult, List<ProductDetails> details) {
-        log("onProductDetailsResponse(" + billingResult + ", " + details + ")");
+    public void onProductDetailsResponse(BillingResult billingResult, QueryProductDetailsResult result) {
+        log("onProductDetailsResponse(" + billingResult + ", " + result + ")");
         if (billingResult.getResponseCode() != OK) {
             Log.w(TAG, "failed to query inventory: " + billingResult);
             return;
@@ -125,7 +128,7 @@ public class DonationActivity extends ThemeActivity implements
 
         productDetails.clear();
         List<Sku> skuList = new ArrayList<Sku>();
-        for (ProductDetails d : details) {
+        for (ProductDetails d : result.getProductDetailsList()) {
             if (d.getProductId().startsWith(DONATION_PREFIX)) {
                 productDetails.put(d.getProductId(), d);
                 skuList.add(new Sku(d));

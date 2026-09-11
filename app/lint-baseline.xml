@@ -80,8 +80,8 @@
 
     <issue
         id="GradleDependency"
-        message="A newer version of com.android.billingclient:billing than 7.1.1 is available: 9.1.0"
-        errorLine1="    implementation &apos;com.android.billingclient:billing:7.1.1&apos;"
+        message="A newer version of com.android.billingclient:billing than 8.0.0 is available: 9.1.0"
+        errorLine1="    implementation &apos;com.android.billingclient:billing:8.0.0&apos;"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="build.gradle"
