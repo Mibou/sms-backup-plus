@@ -1,6 +1,7 @@
 package sms.backup.plus.service;
 
 import android.os.Build;
+import android.preference.PreferenceManager;
 
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
@@ -56,6 +57,35 @@ public class BackupJobsTest {
         when(preferences.getIncomingTimeoutSecs()).thenReturn(2000);
         subject.scheduleIncoming();
         assertScheduled(BackupType.INCOMING.name());
+    }
+
+    @Test public void shouldScheduleRegularIfMissing() throws Exception {
+        when(preferences.isAutoBackupEnabled()).thenReturn(true);
+        when(preferences.getRegularTimeoutSecs()).thenReturn(2000);
+        subject.scheduleRegularIfMissing();
+        assertScheduled(BackupType.REGULAR.name());
+    }
+
+    @Test public void shouldNotScheduleRegularIfMissingWhenAutoBackupDisabled() throws Exception {
+        when(preferences.isAutoBackupEnabled()).thenReturn(false);
+        subject.scheduleRegularIfMissing();
+        assertNotScheduled(BackupType.REGULAR.name());
+    }
+
+    @Test public void shouldScheduleWatchdog() throws Exception {
+        // The test scheduler runs the periodic worker synchronously; it reads the real
+        // preferences (not the mock), so auto backup must be enabled there or the watchdog would
+        // correctly self-cancel (see BackupWatchdogWorker / shouldCancelWatchdog covers that path).
+        PreferenceManager.getDefaultSharedPreferences(RuntimeEnvironment.application)
+            .edit().putBoolean("enable_auto_sync", true).commit();
+        subject.scheduleWatchdog();
+        assertScheduled(BackupJobs.WATCHDOG_TAG);
+    }
+
+    @Test public void shouldCancelWatchdog() throws Exception {
+        subject.scheduleWatchdog();
+        subject.cancelWatchdog();
+        assertNotScheduled(BackupJobs.WATCHDOG_TAG);
     }
 
     @Test @Config(sdk = Build.VERSION_CODES.N)

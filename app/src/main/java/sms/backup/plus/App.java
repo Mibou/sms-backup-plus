@@ -83,6 +83,13 @@ public class App extends Application implements Configuration.Provider {
 
         backupJobs = new BackupJobs(this);
 
+        // Establish the periodic watchdog that guards the regular backup chain. Doing this on
+        // startup (idempotently) ensures existing installs pick it up on their next launch, even
+        // if they never post an AutoBackupSettingsChangedEvent again.
+        if (preferences.isAutoBackupEnabled()) {
+            backupJobs.scheduleWatchdog();
+        }
+
         // On platforms without WorkManager content-uri triggers (API < 24) we fall back to
         // the SMS broadcast receiver to detect incoming messages.
         setBroadcastReceiversEnabled(usesBroadcastReceiver() && preferences.isAutoBackupEnabled());
@@ -213,10 +220,13 @@ public class App extends Application implements Configuration.Provider {
 
         if (preferences.isAutoBackupEnabled()) {
             backupJobs.scheduleRegular();
+            backupJobs.scheduleWatchdog();
 
             if (preferences.getIncomingTimeoutSecs() > 0 && !usesBroadcastReceiver()) {
                 backupJobs.scheduleContentTriggerJob();
             }
+        } else {
+            backupJobs.cancelWatchdog();
         }
     }
 

@@ -25,9 +25,11 @@ import androidx.annotation.RequiresApi;
 import androidx.work.BackoffPolicy;
 import androidx.work.Constraints;
 import androidx.work.Data;
+import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import sms.backup.plus.mail.DataType;
@@ -54,8 +56,13 @@ public class BackupJobs {
     private static final long BACKOFF_DELAY_SECONDS = 30;
 
     static final String CONTENT_TRIGGER_TAG = "contentTrigger";
+    static final String WATCHDOG_TAG = "regularWatchdog";
     static final String DATA_BACKUP_TYPE = "backup_type";
     static final String DATA_CONTENT_TRIGGER = "content_trigger";
+    // How often the watchdog re-checks that the regular backup chain is still alive. This is a
+    // safety net independent of the configured backup interval; the primary driver stays the
+    // self-rescheduling one-time chain.
+    private static final long WATCHDOG_INTERVAL_MINUTES = 120;
 
     private final Context context;
     private final Preferences preferences;
@@ -81,6 +88,33 @@ public class BackupJobs {
 
     public void scheduleRegular() {
         schedule(preferences.getRegularTimeoutSecs(), REGULAR, false);
+    }
+
+    /**
+     * Ensures a regular backup is scheduled without disturbing one that is already pending. Used
+     * by {@link BackupWatchdogWorker} to repair the self-rescheduling chain if an interrupted run
+     * ever broke it; a healthy chain always has a pending regular job, so this is then a no-op.
+     */
+    public void scheduleRegularIfMissing() {
+        schedule(preferences.getRegularTimeoutSecs(), REGULAR, false, ExistingWorkPolicy.KEEP);
+    }
+
+    /**
+     * Schedules the periodic watchdog that guards the regular backup chain. Idempotent: an
+     * existing watchdog is kept (its schedule is not reset), so this is safe to call on every app
+     * start.
+     */
+    public void scheduleWatchdog() {
+        if (LOCAL_LOGV) Log.v(TAG, "scheduleWatchdog()");
+        final PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(
+                BackupWatchdogWorker.class, WATCHDOG_INTERVAL_MINUTES, TimeUnit.MINUTES)
+            .addTag(WATCHDOG_TAG)
+            .build();
+        workManager().enqueueUniquePeriodicWork(WATCHDOG_TAG, ExistingPeriodicWorkPolicy.KEEP, request);
+    }
+
+    public void cancelWatchdog() {
+        cancel(WATCHDOG_TAG);
     }
 
     public void scheduleBootup() {
@@ -131,12 +165,16 @@ public class BackupJobs {
     }
 
     private void schedule(int inSeconds, BackupType backupType, boolean force) {
+        schedule(inSeconds, backupType, force, ExistingWorkPolicy.REPLACE);
+    }
+
+    private void schedule(int inSeconds, BackupType backupType, boolean force, ExistingWorkPolicy policy) {
         if (LOCAL_LOGV) {
             Log.v(TAG, "scheduleBackup(" + inSeconds + ", " + backupType + ", " + force + ")");
         }
 
         if (force || (preferences.isAutoBackupEnabled() && inSeconds > 0)) {
-            enqueue(backupType.name(), createRequest(inSeconds, backupType));
+            enqueue(backupType.name(), createRequest(inSeconds, backupType), policy);
             if (LOCAL_LOGV) {
                 Log.v(TAG, "Scheduled backup job " + backupType + " due " +
                         (inSeconds > 0 ? "in " + inSeconds + " seconds" : "now"));
@@ -147,7 +185,11 @@ public class BackupJobs {
     }
 
     private void enqueue(String uniqueName, OneTimeWorkRequest request) {
-        workManager().enqueueUniqueWork(uniqueName, ExistingWorkPolicy.REPLACE, request);
+        enqueue(uniqueName, request, ExistingWorkPolicy.REPLACE);
+    }
+
+    private void enqueue(String uniqueName, OneTimeWorkRequest request, ExistingWorkPolicy policy) {
+        workManager().enqueueUniqueWork(uniqueName, policy, request);
     }
 
     private @NonNull OneTimeWorkRequest createRequest(int inSeconds, BackupType backupType) {
