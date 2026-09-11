@@ -80,23 +80,12 @@
 
     <issue
         id="GradleDependency"
-        message="A newer version of com.android.billingclient:billing than 8.0.0 is available: 9.1.0"
-        errorLine1="    implementation &apos;com.android.billingclient:billing:8.0.0&apos;"
-        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="82"
-            column="20"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
         message="A newer version of androidx.work:work-runtime than 2.8.1 is available: 2.11.2"
         errorLine1="    implementation &apos;androidx.work:work-runtime:2.8.1&apos;"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="build.gradle"
-            line="83"
+            line="92"
             column="20"/>
     </issue>
 
@@ -107,7 +96,7 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="build.gradle"
-            line="84"
+            line="93"
             column="20"/>
     </issue>
 
@@ -118,7 +107,7 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="build.gradle"
-            line="85"
+            line="94"
             column="20"/>
     </issue>
 
@@ -129,7 +118,7 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="build.gradle"
-            line="86"
+            line="95"
             column="20"/>
     </issue>
 
@@ -140,7 +129,7 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="build.gradle"
-            line="87"
+            line="96"
             column="20"/>
     </issue>
 
@@ -151,7 +140,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~~~~~">
         <location
             file="build.gradle"
-            line="89"
+            line="98"
             column="24"/>
     </issue>
 
@@ -162,7 +151,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="build.gradle"
-            line="93"
+            line="102"
             column="24"/>
     </issue>
 
@@ -300,7 +289,7 @@
 
     <issue
         id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 21"
+        message="Unnecessary; `SDK_INT` is always >= 23"
         errorLine1="        Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN ? new String[]{ READ_CONTACTS, READ_CALL_LOG } : new String[]{ READ_CONTACTS }"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -311,7 +300,7 @@
 
     <issue
         id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 21"
+        message="Unnecessary; `SDK_INT` is always >= 23"
         errorLine1="                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -333,7 +322,7 @@
 
     <issue
         id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 21"
+        message="Unnecessary; `SDK_INT` is always >= 23"
         errorLine1="        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -344,7 +333,18 @@
 
     <issue
         id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 21"
+        message="Unnecessary; `SDK_INT` is always >= 23"
+        errorLine1="        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/sms/backup/plus/service/ServiceBase.java"
+            line="204"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; `SDK_INT` is always >= 23"
         errorLine1="        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -377,7 +377,7 @@
 
     <issue
         id="ObsoleteSdkInt"
-        message="Unnecessary; `Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT` is never true here (`SDK_INT` ≥ 21 and &lt; 29)"
+        message="Unnecessary; `Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT` is never true here (`SDK_INT` ≥ 23 and &lt; 29)"
         errorLine1="        }  else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {"
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -388,7 +388,7 @@
 
     <issue
         id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is never &lt; 21"
+        message="Unnecessary; `SDK_INT` is never &lt; 23"
         errorLine1="        return Build.VERSION.SDK_INT &lt; Build.VERSION_CODES.KITKAT ||"
         errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -399,7 +399,7 @@
 
     <issue
         id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 21"
+        message="Unnecessary; `SDK_INT` is always >= 23"
         errorLine1="        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -410,7 +410,7 @@
 
     <issue
         id="ObsoleteSdkInt"
-        message="Unnecessary; `SDK_INT` is always >= 21"
+        message="Unnecessary; `SDK_INT` is always >= 23"
         errorLine1="        if (Build.VERSION.SDK_INT >= 14) {"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location

@@ -20,14 +20,14 @@ public class SmsReceiverTest {
         subject = new SmsReceiver();
     }
 
-    // minSdk is 21, so the pre-KitKat (< 19) branch is unreachable; LOLLIPOP is the lowest
+    // minSdk is 23, so the pre-KitKat (< 19) branch is unreachable; M is the lowest
     // supported SDK and exercises the pre-Q default-SMS-package branch.
-    @Test @Config(sdk = Build.VERSION_CODES.LOLLIPOP)
+    @Test @Config(sdk = Build.VERSION_CODES.M)
     public void testOnReceive() {
         subject.onReceive(RuntimeEnvironment.application, new Intent());
     }
 
-    @Test @Config(sdk = Build.VERSION_CODES.LOLLIPOP)
+    @Test @Config(sdk = Build.VERSION_CODES.M)
     public void testIsSmsBackupNotDefaultSmsApp() {
         assertThat(SmsReceiver.isSmsBackupDefaultSmsApp(RuntimeEnvironment.application)).isFalse();
     }
